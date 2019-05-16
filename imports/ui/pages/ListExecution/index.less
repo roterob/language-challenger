@@ -1,0 +1,93 @@
+@import '../../../../node_modules/antd/lib/style/themes/default.less';
+
+.content {
+  :global {
+    .ant-row {
+      min-height: 60px;
+
+      .left-content {
+        font-size: 18px;
+        font-weight: 500;
+        padding: 10px;
+        text-align: center;
+        color: #000;
+      }
+
+      .right-content {
+        font-size: 32px;
+        text-align: center;
+        padding: 10px 0px;
+
+        > i {
+          cursor: pointer;
+        }
+      }
+    }
+    .ant-row:first-child {
+      border-bottom: solid 1px #e8e8e8;
+    }
+    .footer {
+      border-bottom: solid 1px #e8e8e8;
+      box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+      min-height: 40px;
+      display: flex;
+
+      .ant-btn {
+        width: 50%;
+        border-radius: 0px;
+        height: 100%;
+        font-weight: 700;
+        color: white;
+
+        &.success {
+          background-color: @success-color;
+
+          &.desactive {
+            background-color: #daf4cd;
+          }
+        }
+        &.fail {
+          background-color: @error-color;
+
+          &.desactive {
+            background-color: #ffdbdd;
+          }
+        }
+      }
+    }
+  }
+}
+
+.modal:not(.isLoading) {
+  :global {
+    .ant-modal-body {
+      padding: 0;
+    }
+    .ant-form {
+      padding-top: 24px;
+    }
+  }
+}
+
+:global {
+  @media (max-width: 575px) {
+    .ant-form-item {
+      .ant-form-item-label {
+        overflow: hidden !important;
+        line-height: 39.9999px !important;
+        white-space: nowrap !important;
+        text-align: right !important;
+        vertical-align: middle !important;
+      }
+      .ant-form-item-control {
+        &::before {
+          content: ':' !important;
+          position: relative !important;
+          top: -0.5px !important;
+          margin: 0 8px 0 2px !important;
+          display: inline;
+        }
+      }
+    }
+  }
+}

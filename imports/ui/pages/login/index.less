@@ -1,0 +1,69 @@
+.login-container {
+  background-image: url(/login_background.svg);
+  background-repeat: no-repeat;
+  background-position: center 110px;
+  background-size: 100%;
+
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: auto;
+  background-color: #f0f2f5;
+
+  :global {
+    .login-layout-lang {
+      text-align: right;
+      width: 100%;
+      height: 40px;
+      line-height: 44px;
+    }
+
+    .login-layout-content {
+      padding: 32px 0 24px;
+
+      .login-layout-top-header {
+        text-align: center;
+
+        .login-layout-logo {
+          height: 44px;
+          vertical-align: top;
+          margin-right: 16px;
+        }
+
+        .login-layout-title {
+          font-size: 33px;
+          color: rgba(0, 0, 0, 0.85);
+          font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+          font-weight: 600;
+          position: relative;
+          top: 2px;
+        }
+      }
+      .login-layout-desc {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-top: 12px;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+    }
+
+    .login-form {
+      width: 368px;
+      margin: 0 auto;
+
+      .ant-alert {
+        margin-bottom: 24px;
+      }
+
+      .login-form-forgot {
+        float: right;
+      }
+
+      .login-form-button {
+        width: 100%;
+        margin-top: 24px;
+      }
+    }
+  }
+}
