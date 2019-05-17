@@ -3,9 +3,8 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 
 import '../../../client/main.less';
-import Content from '../../../imports/ui/pages/ListExecution/Content';
 import ListExecution from '../../../imports/ui/pages/ListExecution/ListExecution';
-import Config from '../../../imports/ui/pages/ListExecution/ConfigForm';
+import Result from '../../../imports/ui/pages/ListExecution/Result';
 
 import dispatchMock from '../../common/dispatch-mock';
 
@@ -13,12 +12,11 @@ import { resources, listExecution, listExecutionFinished } from './data';
 
 const executionConfig = {
   questionLang: 'es',
-  playQuestion: true,
+  playQuestion: false,
   playAnswer: true,
 };
 
 storiesOf('pages.ListExecution', module)
-  .add('content', () => <Content />)
   .add('modal-isLoading', () => (
     <ListExecution isLoading={true} fetchTimestamp={new Date().getTime()} />
   ))
@@ -44,6 +42,19 @@ storiesOf('pages.ListExecution', module)
     <ListExecution
       isLoading={false}
       listExecution={{ ...listExecutionFinished, config: executionConfig }}
+      resources={resources}
+      fetchTimestamp={new Date().getTime()}
+      dispatch={dispatchMock}
+    />
+  ))
+  .add('modal-empty', () => (
+    <ListExecution
+      isLoading={false}
+      listExecution={{
+        ...listExecution,
+        results: [],
+        config: executionConfig,
+      }}
       resources={resources}
       fetchTimestamp={new Date().getTime()}
       dispatch={dispatchMock}

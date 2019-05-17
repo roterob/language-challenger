@@ -5,20 +5,42 @@ import Modal from 'antd/lib/modal';
 import Button from 'antd/lib/button';
 import Icon from 'antd/lib/icon';
 import Skeleton from 'antd/lib/skeleton';
+import Select from 'antd/lib/select';
+import Empty from 'antd/lib/empty';
 
 import Content from './Content';
+import Result from './Result';
 import Config from './ConfigForm';
 import styles from './index.less';
 
 import arrayToHashmap from '../../../modules/array-to-hashmap';
+
+const confirm = Modal.confirm;
 
 export default ({
   isLoading,
   fetchTimestamp,
   listExecution = {},
   resources = [],
+  dispatch,
 }) => {
-  const [showConfig, setShowConfig] = useState(listExecution.config == null);
+  const CONFIG_MODE = 'config';
+  const RESULT_MODE = 'result';
+  const RUN_MODE = 'run';
+
+  const getInitViewMode = () => {
+    if (listExecution.config == null) {
+      return CONFIG_MODE;
+    } else if (listExecution.inProgress) {
+      return RUN_MODE;
+    } else {
+      return RESULT_MODE;
+    }
+  };
+
+  const [filteredList, setFilteredList] = useState(null);
+  const [showModal, setShowModal] = useState(true);
+  const [viewMode, setViewMode] = useState(getInitViewMode());
   const [currentIndex, setCurrentIndex] = useState(
     listExecution.currentIndex || 0,
   );
@@ -33,16 +55,77 @@ export default ({
     results = [],
   } = listExecution;
 
+  const list = filteredList || results;
+
   useMemo(() => {
     const resourcesHashmap = arrayToHashmap('_id', resources);
     results.forEach(r => (r.resource = resourcesHashmap[r.resourceId]));
   }, [fetchTimestamp]);
 
-  const handleShowConfig = () => {
-    setShowConfig(!showConfig);
+  const stats = useMemo(() => {
+    const stats = {
+      correct: 0,
+      incorrect: 0,
+      noresults: 0,
+    };
+    results.forEach(r => {
+      if (r.result == null) {
+        stats.noresults += 1;
+      } else if (r.result) {
+        stats.correct += 1;
+      } else {
+        stats.incorrect += 1;
+      }
+    });
+    return stats;
+  }, [viewMode]);
+
+  const goNext = () => {
+    if (currentIndex == list.length - 1) {
+      dispatch('listExecutions.finishList', listExecution._id);
+      setCurrentIndex(0);
+      setViewMode(RESULT_MODE);
+    } else {
+      setCurrentIndex(currentIndex + 1);
+    }
   };
 
-  const handleClose = () => {};
+  const handleFilterChange = value => {
+    let newFilteredList = null;
+
+    if (value != 'all') {
+      newFilteredList = results.filter(r => r.result == (value == 'correct'));
+    }
+
+    setCurrentIndex(0);
+    setFilteredList(newFilteredList);
+  };
+
+  const handleShowConfig = () => {
+    setViewMode(CONFIG_MODE);
+  };
+
+  const handleSaveResult = isCorrect => {
+    if (listExecution.inProgress) {
+      const result = { ...results[currentIndex].result, result: isCorrect };
+      dispatch('listExecutions.saveResult', listExecution._id, result);
+      goNext();
+    }
+  };
+
+  const handleClose = () => {
+    if (listExecution.inProgress) {
+      confirm({
+        title: 'Are you sure want to exit?',
+        content: 'You can continue with the list execution later',
+        onOk() {
+          setShowModal(false);
+        },
+      });
+    } else {
+      setShowModal(false);
+    }
+  };
 
   const handleSaveConfig = () => {
     const form = formRef.current.props.form;
@@ -52,8 +135,17 @@ export default ({
         return;
       }
 
-      setShowConfig(false);
+      if (executionList.inProgress) {
+        const newConfig = { ...config, ...values };
+        dispatch('listExecutions.saveConfig', listExecution._id, newConfig);
+      }
+      setViewMode(RUN_MODE);
     });
+  };
+
+  const handleShowResults = () => {
+    const newViewMode = viewMode === RESULT_MODE ? RUN_MODE : RESULT_MODE;
+    setViewMode(newViewMode);
   };
 
   const getFooter = () => {
@@ -71,13 +163,40 @@ export default ({
         <Button
           key="goRight"
           icon="arrow-right"
-          disabled={results.length == 0 || currentIndex == results.length - 1}
+          disabled={
+            list.length == 0 ||
+            currentIndex == list.length - 1 ||
+            viewMode !== RUN_MODE ||
+            list[currentIndex].result == null
+          }
           onClick={() => setCurrentIndex(currentIndex + 1)}
           style={{ float: 'left' }}
         />,
-        <Button key="cancel">Cancelar</Button>,
       ];
-      if (showConfig) {
+
+      if (!listExecution.inProgress) {
+        res.push([
+          <Button key="stats" type="primary" onClick={handleShowResults}>
+            {viewMode === RUN_MODE ? 'Stats' : 'Review'}
+          </Button>,
+        ]);
+        if (viewMode == RUN_MODE) {
+          res.push([
+            <Select
+              key="fitler"
+              style={{ float: 'left', width: 100, paddingLeft: 8 }}
+              onChange={handleFilterChange}
+              defaultValue="all"
+            >
+              <Select.Option value="all">All</Select.Option>
+              <Select.Option value="correct">Correct</Select.Option>
+              <Select.Option value="incorrect">Incorrect</Select.Option>
+            </Select>,
+          ]);
+        }
+      }
+
+      if (viewMode == CONFIG_MODE) {
         res = [
           <Button key="continue" type="primary" onClick={handleSaveConfig}>
             Continue
@@ -95,12 +214,14 @@ export default ({
         <React.Fragment>
           <Icon type="setting" onClick={handleShowConfig} />
           <span style={{ marginLeft: 10 }}>List execution</span>
-          <span style={{ marginLeft: 10 }}>{`${currentIndex + 1}/${
-            results.length
-          }`}</span>
+          {list.length > 0 && (
+            <span style={{ marginLeft: 10 }}>{`${currentIndex + 1}/${
+              list.length
+            }`}</span>
+          )}
         </React.Fragment>
       );
-      if (showConfig) {
+      if (viewMode == CONFIG_MODE) {
         res = 'Execution configuration';
       }
     }
@@ -109,7 +230,8 @@ export default ({
 
   return (
     <Modal
-      visible
+      visible={showModal}
+      closable
       footer={getFooter()}
       title={getTitle()}
       onCancel={handleClose}
@@ -118,13 +240,21 @@ export default ({
       })}
     >
       <Skeleton loading={isLoading} active>
-        {showConfig ? (
+        {viewMode == CONFIG_MODE ? (
           <Config
             wrappedComponentRef={ref => (formRef.current = ref)}
             {...config}
           />
+        ) : viewMode == RESULT_MODE ? (
+          <Result {...stats} />
+        ) : list.length > 0 ? (
+          <Content
+            result={list[currentIndex]}
+            config={config}
+            onResult={handleSaveResult}
+          />
         ) : (
-          <Content result={results[currentIndex]} config={config} />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </Skeleton>
     </Modal>

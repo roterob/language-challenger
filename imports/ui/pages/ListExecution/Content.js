@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import classNames from 'classnames';
 
 import Row from 'antd/lib/row';
@@ -9,9 +9,13 @@ import Button from 'antd/lib/button';
 import styles from './index.less';
 
 export default ({ config, result, onResult }) => {
-  const [revealAnswer, setRevealAnswer] = useState(result.result != null);
+  const [revealAnswer, setRevealAnswer] = useState(false);
   const { questionLang, playQuestion, playAnswer } = config;
   const { resource } = result;
+
+  useMemo(() => {
+    setRevealAnswer(result.result != null);
+  }, [result.resourceId]);
 
   const answerLang = questionLang === 'es' ? 'en' : 'es';
 

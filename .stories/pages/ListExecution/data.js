@@ -1,7 +1,7 @@
 export const listExecution = {
   _id: '1',
   listId: '2',
-  inProgres: true,
+  inProgress: true,
   results: [
     {
       resourceId: '1',
@@ -22,7 +22,7 @@ export const listExecution = {
 export const listExecutionFinished = {
   _id: '1',
   listId: '2',
-  inProgres: false,
+  inProgress: false,
   results: [
     {
       resourceId: '1',
