@@ -18,6 +18,7 @@ export const listExecution = {
   ],
   userId: '1',
   createdAt: new Date(),
+  updatedAt: new Date(),
 };
 export const listExecutionFinished = {
   _id: '1',
@@ -38,6 +39,7 @@ export const listExecutionFinished = {
     },
   ],
   userId: '1',
+  createdAt: new Date(),
   createdAt: new Date(),
 };
 export const resources = [

@@ -1,10 +1,8 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
 
 import '../../../client/main.less';
-import ListExecution from '../../../imports/ui/pages/ListExecution/ListExecution';
-import Result from '../../../imports/ui/pages/ListExecution/Result';
+import ListExecution from '../../../imports/ui/components/ListExecution/ListExecution';
 
 import dispatchMock from '../../common/dispatch-mock';
 
@@ -16,7 +14,7 @@ const executionConfig = {
   playAnswer: true,
 };
 
-storiesOf('pages.ListExecution', module)
+storiesOf('components.ListExecution', module)
   .add('isLoading', () => (
     <ListExecution isLoading={true} fetchTimestamp={new Date().getTime()} />
   ))
