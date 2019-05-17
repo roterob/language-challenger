@@ -11,7 +11,7 @@ import data from './data';
 
 const filters = { type: null, tags: [] };
 
-storiesOf('pages.Resources.Resources', module)
+storiesOf('pages.Resources', module)
   .add('isLoading', () => (
     <Resources isLoading data={[]} fetchTimestamp={null} filters={filters} />
   ))

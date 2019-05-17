@@ -10,7 +10,7 @@ import { lists, userStats } from './data';
 
 const filters = { type: null, tags: [] };
 
-storiesOf('pages.Lists.Lists', module)
+storiesOf('pages.Lists', module)
   .add('isLoading', () => (
     <Lists
       isLoading

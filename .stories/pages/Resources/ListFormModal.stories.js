@@ -31,8 +31,8 @@ const handleOnSaving = (resource, callback) => {
   setTimeout(() => callback(), 1000);
 };
 
-storiesOf('pages.Resources.ListFormModal', module)
-  .add('default', () => (
+storiesOf('pages.Resources', module)
+  .add('ListFormModal_default', () => (
     <ListFormModal
       data={data}
       index={0}
@@ -40,7 +40,7 @@ storiesOf('pages.Resources.ListFormModal', module)
       onClose={action('onClose')}
     />
   ))
-  .add('one phrase', () => (
+  .add('ListFormModal_one phrase', () => (
     <ListFormModal
       list={data[1]}
       onSave={handleOnSaving}

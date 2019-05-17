@@ -17,10 +17,10 @@ const executionConfig = {
 };
 
 storiesOf('pages.ListExecution', module)
-  .add('modal-isLoading', () => (
+  .add('isLoading', () => (
     <ListExecution isLoading={true} fetchTimestamp={new Date().getTime()} />
   ))
-  .add('modal-config', () => (
+  .add('config', () => (
     <ListExecution
       isLoading={false}
       listExecution={listExecution}
@@ -29,7 +29,7 @@ storiesOf('pages.ListExecution', module)
       dispatch={dispatchMock}
     />
   ))
-  .add('modal-inProgress', () => (
+  .add('inProgress', () => (
     <ListExecution
       isLoading={false}
       listExecution={{ ...listExecution, config: executionConfig }}
@@ -38,7 +38,7 @@ storiesOf('pages.ListExecution', module)
       dispatch={dispatchMock}
     />
   ))
-  .add('modal-finished', () => (
+  .add('finished', () => (
     <ListExecution
       isLoading={false}
       listExecution={{ ...listExecutionFinished, config: executionConfig }}
@@ -47,7 +47,7 @@ storiesOf('pages.ListExecution', module)
       dispatch={dispatchMock}
     />
   ))
-  .add('modal-empty', () => (
+  .add('empty', () => (
     <ListExecution
       isLoading={false}
       listExecution={{
