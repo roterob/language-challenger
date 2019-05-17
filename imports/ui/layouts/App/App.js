@@ -18,6 +18,7 @@ import Page1 from '../../pages/Page1';
 const ActivityPage = React.lazy(() => import('../../pages/Dashboard/Activity'));
 const ResourcesPage = React.lazy(() => import('../../pages/Resources'));
 const LoginPage = React.lazy(() => import('../../pages/login'));
+const ListsPage = React.lazy(() => import('../../pages/Lists'));
 
 import styles from './index.less';
 
@@ -147,6 +148,11 @@ class App extends React.Component {
                   exact
                   path="/Resources"
                   render={() => <ResourcesPage />}
+                />
+                <Route
+                  exact
+                  path="/Lists"
+                  render={() => <ListsPage />}
                 />
               </Switch>
             </React.Suspense>

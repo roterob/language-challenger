@@ -14,6 +14,7 @@ Meteor.methods({
 
     try {
       // TODO: Your code goes here
+      throw new Meteor.Error('method-not-implemented', '<%=name.toLowerCase()%>.<%=methodName%> is not implemented')
     } catch (exception) {
       handleMethodException(exception);
     }

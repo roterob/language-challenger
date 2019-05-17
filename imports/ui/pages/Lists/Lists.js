@@ -25,6 +25,7 @@ function Lists({
   dispatch,
 }) {
   const [resourceIndex, setResourceIndex] = useState(null);
+  const [executionId, setExecutionId] = useState(null);
 
   const dataWithStas = useMemo(() => {
     const statsHashmap = arrayToHashmap('listId', userStats);
@@ -48,11 +49,6 @@ function Lists({
     }
   };
 
-  const handleTypeClick = type => {
-    const { tags } = filters;
-    handleSearchChange({ type, tags });
-  };
-
   const handleSearchChange = ({ type, tags }) => {
     onDataQuery({ type, tags });
   };
@@ -69,6 +65,14 @@ function Lists({
     setResourceIndex(index);
   };
 
+  const handleStartList = (listId, callback) => {
+    dispatch('lists.createExecution', listId, (err, res) => {
+      callback(err, res);
+      setExecutionId(res);
+      return true;
+    });
+  };
+
   const { type, tags } = filters;
 
   const headerContent = (
@@ -81,7 +85,7 @@ function Lists({
         <div>
           <TagInput
             tags={tags}
-            onChange={handleSearchChange}
+            onChange={tags => handleSearchChange({ type: null, tags })}
             autocompleteTags={collectedTags}
           />
         </div>
@@ -114,6 +118,7 @@ function Lists({
               data={dataWithStas}
               onTagClick={handleTagClick}
               onEditClick={handleEditList}
+              onStartList={handleStartList}
             />
           </Col>
         </Row>

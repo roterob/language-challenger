@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Table from 'antd/lib/table';
 import Tag from 'antd/lib/tag';
@@ -13,7 +13,12 @@ import StatChar from './StatChar';
 
 const Column = Table.Column;
 
-function ListTable({ data, onTagClick, onEditClick }) {
+function ListTable({ data, onTagClick, onEditClick, onStartList }) {
+  const [startListId, setStartListId] = useState(null);
+  const handleStartList = id => {
+    setStartListId(id);
+    onStartList(id, () => setStartListId(null));
+  };
   return (
     <Card style={{ marginBottom: 24 }} bordered={false}>
       <Row style={{ marginTop: 12 }}>
@@ -51,7 +56,13 @@ function ListTable({ data, onTagClick, onEditClick }) {
               width={150}
               render={(id, record, index) => (
                 <ButtonGroup>
-                  <Button icon="play-circle">Start</Button>
+                  <Button
+                    icon="play-circle"
+                    loading={id == startListId}
+                    onClick={() => handleStartList(id)}
+                  >
+                    Start
+                  </Button>
                   <Button
                     icon="edit"
                     onClick={() => onEditClick(id, record, index)}

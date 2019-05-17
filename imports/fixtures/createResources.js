@@ -9,22 +9,24 @@ function generateTags() {
 }
 
 export default () => {
-  for (let i = 0; i < 100; i++) {
-    const resource = {
-      type: faker.random.arrayElement(['vocabulary', 'phrase', 'paragraph']),
-      tags: generateTags(),
-      info: {
-        es: {
-          text: faker.lorem.sentence(),
-          audio: faker.internet.url(),
+  if (Resources.find().count() == 0) {
+    for (let i = 0; i < 200; i++) {
+      const resource = {
+        type: faker.random.arrayElement(['vocabulary', 'phrase', 'paragraph']),
+        tags: generateTags(),
+        info: {
+          es: {
+            text: faker.lorem.sentence(),
+            audio: faker.internet.url(),
+          },
+          en: {
+            text: faker.lorem.sentence(),
+            audio: faker.internet.url(),
+          },
         },
-        en: {
-          text: faker.lorem.sentence(),
-          audio: faker.internet.url(),
-        },
-      },
-    };
+      };
 
-    Resources.insert(resource);
+      Resources.insert(resource);
+    }
   }
 };

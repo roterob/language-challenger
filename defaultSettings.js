@@ -16,7 +16,12 @@ module.exports = {
       name: 'Activity',
       path: '/Dashboard/Activity',
     },
-    { key: 'lists', icon: 'ordered-list', name: 'Lists', path: '/Page1' },
+    {
+      key: 'lists',
+      icon: 'unordered-list',
+      name: 'Lists',
+      path: '/Lists',
+    },
     {
       key: 'resources',
       icon: 'database',

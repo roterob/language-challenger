@@ -3,6 +3,8 @@ import message from 'antd/lib/message';
 
 import '../api/Users/methods';
 
+import '../api/Lists/methods.js';
+
 function callback(error) {
   if (error) {
     message.error(error.reason || error);

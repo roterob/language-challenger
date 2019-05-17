@@ -23,6 +23,7 @@ export default ({
   listExecution = {},
   resources = [],
   dispatch,
+  onClose,
 }) => {
   const CONFIG_MODE = 'config';
   const RESULT_MODE = 'result';
@@ -120,10 +121,12 @@ export default ({
         content: 'You can continue with the list execution later',
         onOk() {
           setShowModal(false);
+          onClose();
         },
       });
     } else {
       setShowModal(false);
+      onClose();
     }
   };
 

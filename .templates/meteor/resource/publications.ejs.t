@@ -9,7 +9,7 @@ import settings from '../../../../defaultSettings';
 
 const { maxElementsResult } = settings;
 
-Meteor.publish('<%=name.toLowerCase()%>', function users(filters, fields) {
+Meteor.publish('<%=name.toLowerCase()%>', function <%=name.toLowerCase()%>(filters, fields) {
   check(fields, Match.Maybe(Object));
   check(filters, Match.Maybe(Object));
 
