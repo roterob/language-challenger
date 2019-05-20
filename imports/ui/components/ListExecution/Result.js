@@ -28,14 +28,14 @@ export default function({ correct = 0, incorrect = 0, noresults = 0 }) {
           ))}
         </Pie>
       </PieChart>
-      <span style={{ fontSize: 18, fontWeight: 'bold', color: COLORS[0] }}>
+      <span style={{ fontSize: 18, fontWeight: 'bold', color: COLORS[1] }}>
         {correct}
       </span>
       <span
         style={{
           fontSize: 18,
           fontWeight: 'bold',
-          color: COLORS[1],
+          color: COLORS[0],
           paddingLeft: 10,
         }}
       >

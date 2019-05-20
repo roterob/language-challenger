@@ -22,6 +22,6 @@ nathantreid:css-modules
 react-meteor-data
 accounts-password
 percolate:migrations
-aldeed:collection2-core
 dynamic-import
 reywood:publish-composite
+aldeed:collection2

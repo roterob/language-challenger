@@ -41,10 +41,8 @@ export default ({
 
   const [filteredList, setFilteredList] = useState(null);
   const [showModal, setShowModal] = useState(true);
-  const [viewMode, setViewMode] = useState(getInitViewMode());
-  const [currentIndex, setCurrentIndex] = useState(
-    listExecution.currentIndex || 0,
-  );
+  const [viewMode, setViewMode] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
   const formRef = useRef();
 
   const {
@@ -61,6 +59,11 @@ export default ({
   useMemo(() => {
     const resourcesHashmap = arrayToHashmap('_id', resources);
     results.forEach(r => (r.resource = resourcesHashmap[r.resourceId]));
+
+    if (!isLoading && currentIndex == null) {
+      setViewMode(getInitViewMode());
+      setCurrentIndex(listExecution.currentIndex || 0);
+    }
   }, [fetchTimestamp]);
 
   const stats = useMemo(() => {
@@ -83,7 +86,7 @@ export default ({
 
   const goNext = () => {
     if (currentIndex == list.length - 1) {
-      dispatch('listExecutions.finishList', listExecution._id);
+      dispatch('executions.finish', listExecution._id);
       setCurrentIndex(0);
       setViewMode(RESULT_MODE);
     } else {
@@ -108,8 +111,18 @@ export default ({
 
   const handleSaveResult = isCorrect => {
     if (listExecution.inProgress) {
-      const result = { ...results[currentIndex].result, result: isCorrect };
-      dispatch('listExecutions.saveResult', listExecution._id, result);
+      const currentResult = results[currentIndex];
+      const result = {
+        resourceId: currentResult.resourceId,
+        result: isCorrect,
+      };
+      currentResult.result = isCorrect;
+      dispatch(
+        'executions.saveResult',
+        listExecution._id,
+        currentIndex,
+        result,
+      );
       goNext();
     }
   };
@@ -138,9 +151,9 @@ export default ({
         return;
       }
 
-      if (executionList.inProgress) {
+      if (listExecution.inProgress) {
         const newConfig = { ...config, ...values };
-        dispatch('listExecutions.saveConfig', listExecution._id, newConfig);
+        dispatch('executions.saveConfig', listExecution._id, newConfig);
       }
       setViewMode(RUN_MODE);
     });

@@ -1,31 +1,36 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-const ListsExecutions = new Mongo.Collection('ListsExecutions');
+const Executions = new Mongo.Collection('Executions');
 
-ListsExecutions.allow({
+Executions.allow({
   insert: () => false,
   update: () => false,
   remove: () => false,
 });
 
-ListsExecutions.deny({
+Executions.deny({
   insert: () => true,
   update: () => true,
   remove: () => true,
 });
 
-ListsExecutions.schema = new SimpleSchema({
+Executions.schema = new SimpleSchema({
   userId: { type: String, required: true },
   listId: { type: String, required: true },
   inProgress: { type: Boolean, required: true },
   results: { type: Array, required: true },
   'results.$': { type: Object },
   'results.$.resourceId': { type: String, required: true },
-  'results.$.result': { type: Boolean },
+  'results.$.result': { type: Boolean, required: false },
+  config: { type: Object, required: false },
+  'config.questionLang': { type: String, allowedValues: ['en', 'es'] },
+  'config.playQuestion': { type: Boolean, required: true },
+  'config.playAnswer': { type: Boolean, required: true },
+  currentIndex: { type: Number, required: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
 });
 
-ListsExecutions.attachSchema(ListsExecutions.schema);
-export default ListsExecutions;
+Executions.attachSchema(Executions.schema);
+export default Executions;

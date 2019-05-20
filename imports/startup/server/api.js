@@ -6,3 +6,6 @@ import '../../api/Resources/server/publications.js';
 
 import '../../api/Lists/methods.js';
 import '../../api/Lists/server/publications.js';
+
+import '../../api/Executions/methods.js';
+import '../../api/Executions/server/publications.js';

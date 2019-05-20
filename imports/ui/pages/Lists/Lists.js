@@ -10,6 +10,7 @@ import PageHeaderWrapper from '../../components/PageHeaderWrapper';
 import TagInput from '../../components/SearchTagBar/TagInput';
 import ListsTable from './ListsTable';
 import ListFormModal from '../Resources/ListFormModal';
+import ListExecution from '../../components/ListExecution';
 import styles from '../index.less';
 
 import arrayToHashmap from '../../../modules/array-to-hashmap';
@@ -57,8 +58,12 @@ function Lists({
     dispatch('lists.save', list, callback);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseEditList = () => {
     setResourceIndex(null);
+  };
+
+  const handleCloseExecution = () => {
+    setExecutionId(null);
   };
 
   const handleEditList = (id, resource, index) => {
@@ -66,9 +71,11 @@ function Lists({
   };
 
   const handleStartList = (listId, callback) => {
-    dispatch('lists.createExecution', listId, (err, res) => {
+    dispatch('executions.start', listId, (err, res) => {
       callback(err, res);
-      setExecutionId(res);
+      if (!err) {
+        setExecutionId(res);
+      }
       return true;
     });
   };
@@ -127,8 +134,14 @@ function Lists({
             data={data}
             index={resourceIndex}
             onSave={handleSaveList}
-            onClose={handleCloseModal}
+            onClose={handleCloseEditList}
             autocompleteTags={collectedTags}
+          />
+        )}
+        {executionId !== null && (
+          <ListExecution
+            executionId={executionId}
+            onClose={handleCloseExecution}
           />
         )}
       </React.Fragment>
