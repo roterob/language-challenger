@@ -5,25 +5,31 @@ import Tag from 'antd/lib/tag';
 import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
 import Button from 'antd/lib/button';
-import Card from 'antd/lib/card';
 import ButtonGroup from 'antd/lib/button/button-group';
+import Card from 'antd/lib/card';
 
 import withIsLoading from '../../components/hoc/with-is-loading';
 import StatChar from '../../components/Charts/StatChar';
+import Time from './Time';
 
 const Column = Table.Column;
 
-function ListTable({ data, onTagClick, onEditClick, onStartList }) {
-  const [startListId, setStartListId] = useState(null);
-  const handleStartList = id => {
-    setStartListId(id);
-    onStartList(id, () => setStartListId(null));
+function ExecutionsTable({ data, onTagClick, onStartList, onReviewList }) {
+  const [executionId, setExecutionId] = useState(null);
+  const handleStartList = (execId, listId) => {
+    setExecutionId(execId);
+    onStartList(listId, () => setExecutionId(null));
   };
   return (
     <Card style={{ marginBottom: 24 }} bordered={false}>
       <Row style={{ marginTop: 12 }}>
         <Col span={24}>
           <Table rowKey="_id" pagination={{ pageSize: 50 }} dataSource={data}>
+            <Column
+              width={60}
+              dataIndex="updatedAt"
+              render={date => <Time time={date} />}
+            />
             <Column
               title="List"
               dataIndex="name"
@@ -46,9 +52,15 @@ function ListTable({ data, onTagClick, onEditClick, onStartList }) {
             />
             <Column
               title="Stats"
-              dataIndex="stats"
+              dataIndex="counts"
               width={60}
-              render={stats => <StatChar stats={stats} />}
+              render={(counts, record) =>
+                record.inProgress ? (
+                  <Tag color="red">In progress</Tag>
+                ) : (
+                  <StatChar stats={counts} />
+                )
+              }
             />
             <Column
               title=""
@@ -57,16 +69,20 @@ function ListTable({ data, onTagClick, onEditClick, onStartList }) {
               render={(id, record, index) => (
                 <ButtonGroup>
                   <Button
+                    key="play"
                     icon="play-circle"
-                    loading={id == startListId}
-                    onClick={() => handleStartList(id)}
+                    loading={id == executionId}
+                    onClick={() => handleStartList(id, record.listId)}
                   >
                     Start
                   </Button>
-                  <Button
-                    icon="edit"
-                    onClick={() => onEditClick(id, record, index)}
-                  />
+                  {!record.inProgress && (
+                    <Button
+                      key="review"
+                      icon="eye"
+                      onClick={() => onReviewList(id)}
+                    />
+                  )}
                 </ButtonGroup>
               )}
             />
@@ -77,4 +93,4 @@ function ListTable({ data, onTagClick, onEditClick, onStartList }) {
   );
 }
 
-export default withIsLoading(ListTable);
+export default withIsLoading(ExecutionsTable);

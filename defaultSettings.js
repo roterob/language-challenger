@@ -11,10 +11,10 @@ module.exports = {
   },
   menuData: [
     {
-      key: 'activity',
+      key: 'executions',
       icon: 'thunderbolt',
-      name: 'Activity',
-      path: '/Dashboard/Activity',
+      name: 'Executions',
+      path: '/Executions',
     },
     {
       key: 'lists',

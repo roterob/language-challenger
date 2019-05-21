@@ -5,7 +5,12 @@ import Tag from 'antd/lib/tag';
 
 import useEventListener from '../../components/use-event-listener';
 
-function TagInput({ tags = [], autocompleteTags, onChange, size = 'small' }) {
+function TagInput({
+  tags = [],
+  autocompleteTags = [],
+  onChange,
+  size = 'small',
+}) {
   const [dataSource, setDataSource] = useState(autocompleteTags);
   const autoRef = useRef();
   const deletePrevious = useRef(false);

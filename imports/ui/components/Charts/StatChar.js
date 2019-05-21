@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { PieChart, Pie, Legend, Cell } from 'recharts';
 
-export default function({ stats }) {
+export default function({ stats, width = 40, height = 30 }) {
   const COLORS = ['#e8c5c5', '#cae8c5', '#e5e5e5'];
   const data = [
     { name: 'incorrect', value: 0 },
@@ -17,7 +17,7 @@ export default function({ stats }) {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <PieChart width={40} height={30}>
+      <PieChart width={width} height={height}>
         <Pie
           data={data}
           cx={15}

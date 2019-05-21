@@ -12,12 +12,9 @@ import Header from '../Header';
 import Footer from '../../components/Footer/Footer';
 import Loading from '../../components/PageLoading';
 
-import SuccessPage from '../../pages/Success';
-import Page1 from '../../pages/Page1';
-
-const ActivityPage = React.lazy(() => import('../../pages/Dashboard/Activity'));
 const ResourcesPage = React.lazy(() => import('../../pages/Resources'));
 const LoginPage = React.lazy(() => import('../../pages/login'));
+const ExecutionsPage = React.lazy(() => import('../../pages/Executions'));
 const ListsPage = React.lazy(() => import('../../pages/Lists'));
 
 import styles from './index.less';
@@ -136,23 +133,17 @@ class App extends React.Component {
           <Content className={styles.content} style={contentStyle}>
             <React.Suspense fallback={<Loading />}>
               <Switch>
-                <Route exact path="/" component={SuccessPage} />
-                <Route
-                  exact
-                  path="/Dashboard/Activity"
-                  render={() => <ActivityPage />}
-                />
-                <Route exact path="/Success" component={SuccessPage} />
-                <Route exact path="/Page1" component={Page1} />
+                <Route exact path="/" render={() => <ExecutionsPage />} />
                 <Route
                   exact
                   path="/Resources"
                   render={() => <ResourcesPage />}
                 />
+                <Route exact path="/Lists" render={() => <ListsPage />} />
                 <Route
                   exact
-                  path="/Lists"
-                  render={() => <ListsPage />}
+                  path="/Executions"
+                  render={() => <ExecutionsPage />}
                 />
               </Switch>
             </React.Suspense>

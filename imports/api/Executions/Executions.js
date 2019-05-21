@@ -18,6 +18,9 @@ Executions.deny({
 Executions.schema = new SimpleSchema({
   userId: { type: String, required: true },
   listId: { type: String, required: true },
+  name: { type: String, required: true },
+  tags: { type: Array, required: true },
+  'tags.$': { type: String },
   inProgress: { type: Boolean, required: true },
   results: { type: Array, required: true },
   'results.$': { type: Object },
@@ -30,6 +33,9 @@ Executions.schema = new SimpleSchema({
   currentIndex: { type: Number, required: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
+  counts: { type: Object, required: true },
+  'counts.correct': { type: Number },
+  'counts.incorrect': { type: Number },
 });
 
 Executions.attachSchema(Executions.schema);

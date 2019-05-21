@@ -3,8 +3,8 @@ import { check } from 'meteor/check';
 import Lists from '../Lists/Lists';
 import Executions from './Executions';
 import ListStats from '../Lists/ListStats';
+import UserStats from '../Users/UserStats';
 import handleMethodException from '../../modules/handle-method-exception';
-import { exec } from 'child_process';
 
 Meteor.methods({
   'executions.start': function listsStartExecution(listId) {
@@ -18,11 +18,14 @@ Meteor.methods({
         execution = {
           userId,
           listId,
+          name: list.name,
+          tags: list.tags,
           inProgress: true,
           results: list.resources.map(r => ({ resourceId: r, result: null })),
           currentIndex: 0,
           createdAt: new Date().getTime(),
           updatedAt: new Date().getTime(),
+          counts: { correct: 0, incorrect: 0 },
         };
 
         execution._id = Executions.insert(execution);
@@ -78,42 +81,28 @@ Meteor.methods({
     const updateAt = new Date().getTime();
 
     try {
-      if (Meteor.isServer) {
-        const execution = Executions.findOne(executionId);
-        let stats = ListStats.findOne({ userId, listId: execution.listId });
+      const execution = Executions.findOne(executionId);
+      const { listId } = execution;
+      const counts = { correct: 0, incorrect: 0 };
 
-        if (!stats) {
-          stats = {
-            userId,
-            listId: execution.listId,
-            executions: 0,
-            correct: 0,
-            incorrect: 0,
-          };
+      // Updating counters
+      execution.results.forEach(r => {
+        if (r.result) {
+          counts.correct += 1;
+        } else {
+          counts.incorrect += 1;
         }
+      });
 
-        // Updating counters
-        stats.executions += 1;
-        execution.results.forEach(r => {
-          if (r.result) {
-            stats.correct += 1;
-          } else {
-            stats.incorrect += 1;
-          }
-        });
-
-        // Setting
-        ListStats.update(
-          { userId, listId: execution.listId },
-          { $set: stats },
-          { upsert: true },
-        );
+      if (Meteor.isServer) {
+        updateListStats(userId, listId, counts);
+        updateUserStats(userId, counts);
       }
 
       Executions.update(
         { _id: executionId, inProgress: true, userId },
         {
-          $set: { inProgress: false, updateAt },
+          $set: { inProgress: false, updateAt, counts, currentIndex: 0 },
         },
       );
     } catch (exception) {
@@ -121,3 +110,41 @@ Meteor.methods({
     }
   },
 });
+
+function updateListStats(userId, listId, { correct, incorrect }) {
+  let listStats = ListStats.findOne({ userId, listId });
+
+  if (!listStats) {
+    listStats = {
+      userId,
+      listId: listId,
+      executions: 0,
+      correct: 0,
+      incorrect: 0,
+    };
+  }
+
+  listStats.executions += 1;
+  listStats.correct += correct;
+  listStats.incorrect += incorrect;
+
+  ListStats.update({ userId, listId }, { $set: listStats }, { upsert: true });
+}
+
+function updateUserStats(userId, { correct, incorrect }) {
+  let userStats = UserStats.findOne({ userId });
+
+  if (!userStats) {
+    userStats = {
+      executions: 0,
+      correct: 0,
+      incorrect: 0,
+    };
+  }
+
+  userStats.executions += 1;
+  userStats.correct += correct;
+  userStats.incorrect += incorrect;
+
+  UserStats.update({ userId }, { $set: userStats }, { upsert: true });
+}

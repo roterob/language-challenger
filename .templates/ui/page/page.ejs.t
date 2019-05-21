@@ -18,7 +18,7 @@ import SearchTagBar from '../../components/SearchTagBar/SearchTagBar';
 <% } %>
 import styles from '../index.less';
 
-function Resources({
+function <%=name%>({
   isLoading,
   data,
   fetchTimestamp,
@@ -87,4 +87,4 @@ function Resources({
   );
 }
 
-export default Resources;
+export default <%=name%>;

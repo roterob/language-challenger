@@ -4,6 +4,15 @@ const getLocalIdent = require('css-loader/lib/getLocalIdent');
 const excludeLessPaths = [path.resolve(__dirname, '../client/main.less')];
 
 module.exports = async ({ config, mode }) => {
+  config.module.rules.push({
+    test: /\.js$/,
+    loader: 'string-replace-loader',
+    options: {
+      search: "import ListExecution from '../../components/ListExecution';",
+      replace:
+        "import ListExecution from '../../components/ListExecution/ListExecution';",
+    },
+  });
   // Less support
   config.module.rules.push({
     test: /\.less$/,
