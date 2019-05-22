@@ -1,12 +1,46 @@
-export default ({ type, tags }) => {
-  const res = {};
+import { stringToDate } from './date-helpers';
 
-  if (type) {
-    res.type = type;
+export const typeField = {
+  name: 'type',
+  type: 'select',
+  options: ['phrase', 'vocabulary', 'paragraph'],
+  filter: v => ({
+    type: v,
+  }),
+};
+
+export const fromField = {
+  name: 'from',
+  type: 'date',
+  options: ['2 hours ago', 'yesterday', 'last monday'],
+  filter: v => ({
+    createdAt: {
+      $gte: stringToDate(v),
+    },
+  }),
+};
+
+export default tags => {
+  const fields = [typeField, fromField];
+  const normalTags = [];
+  let res = {};
+
+  if (tags) {
+    tags.forEach(t => {
+      if (t.indexOf(':') > 0) {
+        const [name, value] = t.split(':');
+        const field = fields.find(f => f.name == name);
+        const filter = field.filter(value);
+
+        res = { ...res, ...filter };
+      } else {
+        normalTags.push(t);
+      }
+    });
   }
 
-  if (tags && tags.length > 0) {
-    res.tags = { $all: tags };
+  if (normalTags.length > 0) {
+    res.tags = { $all: normalTags };
   }
 
   return res;

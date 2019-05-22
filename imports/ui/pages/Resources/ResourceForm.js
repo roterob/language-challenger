@@ -5,7 +5,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import Select from 'antd/lib/select';
 
 import createFormField from '../../../modules/create-form-field';
-import TagInput from '../../components/SearchTagBar/TagInput';
+import TagInput from '../../components/SearchTagBar';
 import InfoInput from './InfoInput';
 import fixFormWarning from '../../components/fix-form-warning';
 

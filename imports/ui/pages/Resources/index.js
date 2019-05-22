@@ -9,7 +9,7 @@ import ResourcesPage from './Resources';
 import dispatch from '../../../modules/dispatch';
 import buildFilters from '../../../modules/build-filters';
 
-const filtersVar = new ReactiveVar({ type: null, tags: [] });
+const filtersVar = new ReactiveVar([]);
 let fetchTimestamp = null;
 
 export default withTracker(() => {

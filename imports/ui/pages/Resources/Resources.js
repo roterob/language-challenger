@@ -7,7 +7,8 @@ import Avatar from 'antd/lib/avatar';
 import Sping from 'antd/lib/spin';
 
 import PageHeaderWrapper from '../../components/PageHeaderWrapper';
-import SearchTagBar from '../../components/SearchTagBar/SearchTagBar';
+import SearchTagBar from '../../components/SearchTagBar';
+import { typeField } from '../../../modules/build-filters';
 import ResourcesTable from './ResourcesTable';
 import ResourceFormModal from './ResourceFormModal';
 import ListFormModal from './ListFormModal';
@@ -40,20 +41,18 @@ function Resources({
   }, [fetchTimestamp]);
 
   const handleTagClick = tag => {
-    const { type, tags } = filters;
-
-    if (tags.indexOf(tag) < 0) {
-      handleSearchChange({ type, tags: [...tags, tag] });
+    if (filters.indexOf(tag) < 0) {
+      handleSearchChange([...filters, tag]);
     }
   };
 
   const handleTypeClick = type => {
-    const { tags } = filters;
-    handleSearchChange({ type, tags });
+    const newFilters = filters.filter(f => !f.startsWith('type:'));
+    handleSearchChange([`type:${type}`, ...newFilters]);
   };
 
-  const handleSearchChange = ({ type, tags }) => {
-    onDataQuery({ type, tags });
+  const handleSearchChange = tags => {
+    onDataQuery(tags);
   };
 
   const handleSaveResource = (resource, callback) => {
@@ -86,8 +85,6 @@ function Resources({
     });
   };
 
-  const { type, tags } = filters;
-
   const headerContent = (
     <div className={styles.pageHeaderContent}>
       <div className={styles.avatar}>
@@ -97,10 +94,10 @@ function Resources({
         <div className={styles.contentTitle}>Resources</div>
         <div>
           <SearchTagBar
-            type={type}
-            tags={tags}
+            tags={filters}
             onChange={handleSearchChange}
             autocompleteTags={collectedTags}
+            fields={[typeField]}
           />
         </div>
       </div>

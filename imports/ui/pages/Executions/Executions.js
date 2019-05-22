@@ -3,7 +3,8 @@ import React, { useState, useMemo } from 'react';
 import Avatar from 'antd/lib/avatar';
 
 import PageHeaderWrapper from '../../components/PageHeaderWrapper';
-import TagInput from '../../components/SearchTagBar/TagInput';
+import SearchTagBar from '../../components/SearchTagBar';
+import { fromField } from '../../../modules/build-filters';
 import ExecutionsTable from './ExecutionsTable';
 import UserStats from './UserStats';
 import ListExecution from '../../components/ListExecution';
@@ -21,14 +22,9 @@ function Executions({
   onDataQuery,
 }) {
   const [executionId, setExecutionId] = useState(null);
-  const { type, tags } = filters;
-
-  const handleTagInputChange = tags => {
-    onDataQuery({ type: null, tags });
-  };
 
   const handleTagClick = tag => {
-    onDataQuery({ type: null, tags: [...tags, tag] });
+    onDataQuery([...filters, tag]);
   };
 
   const handleStartList = (listId, callback) => {
@@ -60,7 +56,11 @@ function Executions({
         <div className={styles.contentTitle}>My executions</div>
 
         <div>
-          <TagInput tags={tags} onChange={handleTagInputChange} />
+          <SearchTagBar
+            tags={filters}
+            onChange={onDataQuery}
+            fields={[fromField]}
+          />
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import Avatar from 'antd/lib/avatar';
 import Sping from 'antd/lib/spin';
 
 import PageHeaderWrapper from '../../components/PageHeaderWrapper';
-import TagInput from '../../components/SearchTagBar/TagInput';
+import SearchTagBar from '../../components/SearchTagBar';
 import ListsTable from './ListsTable';
 import ListFormModal from '../Resources/ListFormModal';
 import ListExecution from '../../components/ListExecution';
@@ -43,15 +43,9 @@ function Lists({
   }, [fetchTimestamp]);
 
   const handleTagClick = tag => {
-    const { type, tags } = filters;
-
-    if (tags.indexOf(tag) < 0) {
-      handleSearchChange({ type, tags: [...tags, tag] });
+    if (filters.indexOf(tag) < 0) {
+      onDataQuery([...filters, tag]);
     }
-  };
-
-  const handleSearchChange = ({ type, tags }) => {
-    onDataQuery({ type, tags });
   };
 
   const handleSaveList = (list, callback) => {
@@ -80,8 +74,6 @@ function Lists({
     });
   };
 
-  const { type, tags } = filters;
-
   const headerContent = (
     <div className={styles.pageHeaderContent}>
       <div className={styles.avatar}>
@@ -90,9 +82,9 @@ function Lists({
       <div className={styles.content}>
         <div className={styles.contentTitle}>Lists</div>
         <div>
-          <TagInput
-            tags={tags}
-            onChange={tags => handleSearchChange({ type: null, tags })}
+          <SearchTagBar
+            tags={filters}
+            onChange={onDataQuery}
             autocompleteTags={collectedTags}
           />
         </div>

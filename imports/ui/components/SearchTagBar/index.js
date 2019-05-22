@@ -1,36 +1,43 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 
 import AutoComplete from 'antd/lib/auto-complete';
-import Tag from 'antd/lib/tag';
 
-import useEventListener from '../../components/use-event-listener';
+import useEventListener from '../use-event-listener';
+import Tag from './Tag';
 
-function TagInput({
+export default function({
   tags = [],
   autocompleteTags = [],
   onChange,
   size = 'small',
+  fields = [],
 }) {
-  const [dataSource, setDataSource] = useState(autocompleteTags);
+  const autoCompleteDataSource = [
+    ...fields.map(f => `${f.name}:`),
+    ...autocompleteTags,
+  ];
+
+  const [dataSource, setDataSource] = useState(autoCompleteDataSource);
   const autoRef = useRef();
   const deletePrevious = useRef(false);
 
-  const tagStyles = {
-    small: {
-      marginTop: 0,
-    },
-    default: {
-      marginTop: 3,
-      padding: 5,
-      fontSize: 14,
-    },
-  };
+  useMemo(() => {
+    setDataSource([
+      ...fields
+        .filter(f => !tags.some(t => t.startsWith(f.name)))
+        .map(f => `${f.name}:`),
+      ...autocompleteTags,
+    ]);
+  }, [tags.length, autocompleteTags.length]);
 
   const addTag = tag => {
-    if (tag && tags.indexOf(tag) < 0) {
+    if (tag && !tag.endsWith(':') && tags.indexOf(tag) < 0) {
       deletePrevious.current = false;
       onChange([...tags, tag]);
       handleSearchTag('');
+    } else if (tag.endsWith(':')) {
+      const field = tag.substring(0, tag.indexOf(':'));
+      updateAutoCompleteDataSource(field);
     }
   };
 
@@ -38,8 +45,18 @@ function TagInput({
     return autoRef.current.querySelector('input').value;
   };
 
-  const handleKeyDown = e => {
-    if (e.key === 'Enter') {
+  const updateAutoCompleteDataSource = field => {
+    let ds = autoCompleteDataSource;
+    if (field) {
+      ds = (fields.find(f => f.name === field).options || []).map(
+        v => `${field}:${v}`,
+      );
+    }
+    setDataSource(ds);
+  };
+
+  const handleKeyUp = e => {
+    if (e.key === 'Enter' || e.key === ':') {
       const tag = getInputValue();
       addTag(tag);
     } else if (
@@ -65,11 +82,23 @@ function TagInput({
     onChange(tags.filter(t => t !== tag));
   };
 
+  const handleChangeTag = (tag, value, index) => {
+    onChange(
+      tags.map((v, i) => {
+        if (index == i) {
+          return `${tag.trim()}:${value.trim()}`;
+        } else {
+          return v;
+        }
+      }),
+    );
+  };
+
   const handleSearchTag = tag => {
     const tagUpper = tag.toUpperCase();
-    let newDataSource = autocompleteTags;
+    let newDataSource = autoCompleteDataSource;
     if (tag) {
-      newDataSource = autocompleteTags.filter(t =>
+      newDataSource = autoCompleteDataSource.filter(t =>
         t.toUpperCase().includes(tagUpper),
       );
     }
@@ -77,8 +106,8 @@ function TagInput({
   };
 
   useEventListener(
-    'keydown',
-    handleKeyDown,
+    'keyup',
+    handleKeyUp,
     autoRef,
     ref => {
       return ref.current.querySelector('input');
@@ -89,15 +118,15 @@ function TagInput({
   return (
     <div ref={autoRef} style={{ display: 'inline-block' }}>
       {tags.map((t, i) => (
-        <span key={t} style={{ display: 'inline-block' }}>
-          <Tag
-            closable
-            onClose={() => handleDeleteTag(t)}
-            style={tagStyles[size]}
-          >
-            {t}
-          </Tag>
-        </span>
+        <Tag
+          key={t}
+          tag={t}
+          index={i}
+          fields={fields}
+          size={size}
+          onDelete={handleDeleteTag}
+          onChange={handleChangeTag}
+        />
       ))}
       <AutoComplete
         key={`Autocomplete${tags.length}`} // Reset state after delete/add tag
@@ -116,5 +145,3 @@ function TagInput({
     </div>
   );
 }
-
-export default TagInput;
