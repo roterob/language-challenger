@@ -56,7 +56,13 @@ function ExecutionsTable({ data, onTagClick, onStartList, onReviewList }) {
               width={60}
               render={(counts, record) =>
                 record.inProgress ? (
-                  <Tag color="red">In progress</Tag>
+                  <Tag
+                    color="red"
+                    onClick={() => onTagClick('state:in progress')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    In progress
+                  </Tag>
                 ) : (
                   <StatChar stats={counts} />
                 )

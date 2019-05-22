@@ -4,7 +4,7 @@ import Avatar from 'antd/lib/avatar';
 
 import PageHeaderWrapper from '../../components/PageHeaderWrapper';
 import SearchTagBar from '../../components/SearchTagBar';
-import { fromField } from '../../../modules/build-filters';
+import { fromField, execStateField } from '../../../modules/build-filters';
 import ExecutionsTable from './ExecutionsTable';
 import UserStats from './UserStats';
 import ListExecution from '../../components/ListExecution';
@@ -22,6 +22,13 @@ function Executions({
   onDataQuery,
 }) {
   const [executionId, setExecutionId] = useState(null);
+
+  const collectedTags = useMemo(() => {
+    const res = [];
+    data.forEach(r => res.push(...r.tags));
+
+    return [...new Set(res)];
+  }, [fetchTimestamp]);
 
   const handleTagClick = tag => {
     onDataQuery([...filters, tag]);
@@ -59,7 +66,8 @@ function Executions({
           <SearchTagBar
             tags={filters}
             onChange={onDataQuery}
-            fields={[fromField]}
+            fields={[fromField, execStateField]}
+            autocompleteTags={collectedTags}
           />
         </div>
       </div>

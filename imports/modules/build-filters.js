@@ -20,8 +20,17 @@ export const fromField = {
   }),
 };
 
+export const execStateField = {
+  name: 'state',
+  type: 'select',
+  options: ['in progress', 'finished'],
+  filter: v => ({
+    inProgress: v === 'in progress',
+  }),
+};
+
 export default tags => {
-  const fields = [typeField, fromField];
+  const fields = [typeField, fromField, execStateField];
   const normalTags = [];
   let res = {};
 
