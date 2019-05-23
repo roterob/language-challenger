@@ -57,7 +57,7 @@ export default ({ tag, index, fields, size, onDelete, onChange }) => {
 
   const buildDataPickerTag = () => {
     const menu = (
-      <div>
+      <div onClick={stopPropagation}>
         <DataPicker
           open={popupOpen}
           value={stringToMoment(value)}
@@ -79,7 +79,11 @@ export default ({ tag, index, fields, size, onDelete, onChange }) => {
     );
 
     return (
-      <Dropdown overlay={menu} onVisibleChange={setPopupOpen}>
+      <Dropdown
+        overlay={menu}
+        onVisibleChange={setPopupOpen}
+        visible={popupOpen}
+      >
         <span className={styles.value}>{tagValue}</span>
       </Dropdown>
     );
