@@ -3,6 +3,7 @@ import { withTracker } from 'meteor/react-meteor-data';
 
 import ExecutionsCollection from '../../../api/Executions/Executions';
 import ResourcesCollection from '../../../api/Resources/Resources';
+import ResourceStatsCollection from '../../../api/Resources/ResourceStats';
 
 import ListExecution from './ListExecution';
 import dispatch from '../../../modules/dispatch';
@@ -12,11 +13,13 @@ export default withTracker(({ executionId, onClose }) => {
 
   let listExecution = {};
   let resources = [];
+  let resourcesStats = [];
   let fetchTimestamp = null;
 
   if (subscription.ready()) {
     listExecution = ExecutionsCollection.findOne({ _id: executionId });
-    resources = ResourcesCollection.find({}).fetch();
+    resources = ResourcesCollection.find().fetch();
+    resourcesStats = ResourceStatsCollection.find().fetch();
     fetchTimestamp = new Date().getTime();
   }
 
@@ -24,6 +27,7 @@ export default withTracker(({ executionId, onClose }) => {
     isLoading: !subscription.ready(),
     fetchTimestamp,
     listExecution,
+    resourcesStats,
     resources,
     dispatch,
     onClose,

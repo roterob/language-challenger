@@ -6,7 +6,12 @@ import ListExecution from '../../../imports/ui/components/ListExecution/ListExec
 
 import dispatchMock from '../../common/dispatch-mock';
 
-import { resources, listExecution, listExecutionFinished } from './data';
+import {
+  resources,
+  listExecution,
+  listExecutionFinished,
+  resourceStats,
+} from './data';
 
 const executionConfig = {
   questionLang: 'es',
@@ -41,6 +46,7 @@ storiesOf('components.ListExecution', module)
       isLoading={false}
       listExecution={{ ...listExecutionFinished, config: executionConfig }}
       resources={resources}
+      resourcesStats={resourceStats}
       fetchTimestamp={new Date().getTime()}
       dispatch={dispatchMock}
     />

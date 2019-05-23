@@ -4,6 +4,7 @@ import message from 'antd/lib/message';
 import '../api/Users/methods';
 import '../api/Lists/methods';
 import '../api/Executions/methods';
+import '../api/Resources/methods';
 
 function callback(error) {
   if (error) {

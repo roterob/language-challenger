@@ -22,6 +22,7 @@ export default ({
   fetchTimestamp,
   listExecution = {},
   resources = [],
+  resourcesStats = [],
   dispatch,
   onClose,
 }) => {
@@ -58,7 +59,11 @@ export default ({
 
   useMemo(() => {
     const resourcesHashmap = arrayToHashmap('_id', resources);
-    results.forEach(r => (r.resource = resourcesHashmap[r.resourceId]));
+    const resourcesStatsHashmap = arrayToHashmap('resourceId', resourcesStats);
+    results.forEach(r => {
+      r.resource = resourcesHashmap[r.resourceId] || {};
+      r.resource.stats = resourcesStatsHashmap[r.resourceId] || {};
+    });
 
     if (!isLoading && currentIndex == null) {
       setViewMode(getInitViewMode());
@@ -91,6 +96,12 @@ export default ({
       setViewMode(RESULT_MODE);
     } else {
       setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const handleToggleFav = () => {
+    if (currentIndex != null && resources.length > 0) {
+      dispatch('resources.toggleFavourite', resources[currentIndex]._id);
     }
   };
 
@@ -188,6 +199,9 @@ export default ({
           onClick={() => setCurrentIndex(currentIndex + 1)}
           style={{ float: 'left' }}
         />,
+        <Button key="close" onClick={handleClose}>
+          Close
+        </Button>,
       ];
 
       if (!listExecution.inProgress) {
@@ -226,6 +240,10 @@ export default ({
   const getTitle = () => {
     let res = null;
     if (!isLoading) {
+      let isFavourite = false;
+      if (resources.length > 0 && currentIndex != null) {
+        isFavourite = resources[currentIndex].stats.isFavourite;
+      }
       res = (
         <React.Fragment>
           <Icon type="setting" onClick={handleShowConfig} />
@@ -234,6 +252,19 @@ export default ({
             <span style={{ marginLeft: 10 }}>{`${currentIndex + 1}/${
               list.length
             }`}</span>
+          )}
+          {viewMode == RUN_MODE && (
+            <Icon
+              onClick={handleToggleFav}
+              type="star"
+              theme="filled"
+              style={{
+                fontSize: 22,
+                float: 'right',
+                cursor: 'pointer',
+                color: isFavourite ? '#fadb14' : '#e8e8e8',
+              }}
+            />
           )}
         </React.Fragment>
       );
@@ -247,7 +278,7 @@ export default ({
   return (
     <Modal
       visible={showModal}
-      closable
+      closable={isLoading}
       footer={getFooter()}
       title={getTitle()}
       onCancel={handleClose}

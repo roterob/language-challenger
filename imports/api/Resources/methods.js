@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import Resources from './Resources';
+import ResourceStats from './ResourceStats';
 import handleMethodException from '../../modules/handle-method-exception';
 
 Meteor.methods({
@@ -22,6 +23,25 @@ Meteor.methods({
       } else {
         Resources.insert(resource);
       }
+    } catch (exception) {
+      handleMethodException(exception);
+    }
+  },
+  'resources.toggleFavourite': function toggleFavourite(resourceId) {
+    check(resourceId, String);
+    const userId = Meteor.userId();
+
+    try {
+      const stat = ResourceStats.findOne({ userId, resourceId });
+      if (!stat) {
+        stat = ResourceStats.buildDefault({ userId, resourceId });
+      }
+      stat.isFavourite = !stat.isFavourite;
+      ResourceStats.update(
+        { userId, resourceId },
+        { $set: stat },
+        { upsert: true },
+      );
     } catch (exception) {
       handleMethodException(exception);
     }

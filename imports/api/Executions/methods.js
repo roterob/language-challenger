@@ -4,6 +4,7 @@ import Lists from '../Lists/Lists';
 import Executions from './Executions';
 import ListStats from '../Lists/ListStats';
 import UserStats from '../Users/UserStats';
+import ResourceStats from '../Resources/ResourceStats';
 import handleMethodException from '../../modules/handle-method-exception';
 
 Meteor.methods({
@@ -71,6 +72,9 @@ Meteor.methods({
           $set: { 'results.$.result': result.result, currentIndex, updatedAt },
         },
       );
+      if (Meteor.isServer) {
+        updateResourceStats(userId, result.resourceId, result.result);
+      }
     } catch (exception) {
       handleMethodException(exception);
     }
@@ -110,6 +114,34 @@ Meteor.methods({
     }
   },
 });
+
+function updateResourceStats(userId, resourceId, result) {
+  let resourceStats = ResourceStats.findOne({ userId, resourceId });
+
+  if (!resourceStats) {
+    resourceStats = {
+      userId,
+      resourceId,
+      executions: 0,
+      correct: 0,
+      incorrect: 0,
+    };
+  }
+
+  resourceStats.executions += 1;
+  resourceStats.lastExec = new Date();
+  if (result) {
+    resourceStats.correct += 1;
+  } else {
+    resourceStats.incorrect += 1;
+  }
+
+  ResourceStats.update(
+    { userId, resourceId },
+    { $set: resourceStats },
+    { upsert: true },
+  );
+}
 
 function updateListStats(userId, listId, { correct, incorrect }) {
   let listStats = ListStats.findOne({ userId, listId });

@@ -3,12 +3,9 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 
 import '../../client/main.less';
-import SearchTagBar, {
-  typeField,
-  fromField,
-} from '../../imports/ui/components/SearchTagBar';
+import SearchTagBar from '../../imports/ui/components/SearchTagBar';
+import { typeField, fromField } from '../../imports/modules/build-filters';
 import buildFilters from '../../imports/modules/build-filters';
-import { stringToDate } from '../../imports/modules/date-helpers';
 
 function onChange() {
   const tags = arguments[0];

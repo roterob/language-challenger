@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import Executions from '../Executions';
 import Resources from '../../Resources/Resources';
+import ResourceStats from '../../Resources/ResourceStats';
 
 import settings from '../../../../defaultSettings';
 
@@ -29,6 +30,10 @@ Meteor.publish('execution', function execution(id) {
     resourceIds.push(...e.results.map(r => r.resourceId)),
   );
   const resourcesCursor = Resources.find({ _id: { $in: resourceIds } });
+  const resourcesStatsCursor = ResourceStats.find({
+    userId,
+    resourceId: { $in: resourceIds },
+  });
 
-  return [executionCursor, resourcesCursor];
+  return [executionCursor, resourcesCursor, resourcesStatsCursor];
 });

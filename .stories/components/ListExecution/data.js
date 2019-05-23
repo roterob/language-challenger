@@ -71,3 +71,16 @@ export const resources = [
     },
   },
 ];
+
+export const resourceStats = [
+  {
+    _id: '1',
+    userId: '1',
+    resourceId: '2',
+    executions: 2,
+    correct: 1,
+    incorrect: 1,
+    lastExec: new Date(),
+    isFavourite: true,
+  },
+];
