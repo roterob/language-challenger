@@ -16,6 +16,7 @@ Resources.deny({
 });
 
 Resources.schema = new SimpleSchema({
+  resourceCode: { type: String },
   type: { type: String, allowedValues: ['phrase', 'vocabulary', 'paragraph'] },
   tags: { type: Array },
   'tags.$': { type: String },

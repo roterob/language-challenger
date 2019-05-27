@@ -60,7 +60,7 @@ function Executions({
         <Avatar size={64} icon="thunderbolt" />
       </div>
       <div className={styles.content}>
-        <div className={styles.contentTitle}>My executions</div>
+        <div className={styles.contentTitle}>My activity</div>
 
         <div>
           <SearchTagBar

@@ -25,3 +25,4 @@ percolate:migrations
 dynamic-import
 reywood:publish-composite
 aldeed:collection2
+ostrio:files

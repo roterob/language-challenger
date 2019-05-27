@@ -28,6 +28,12 @@ module.exports = {
       name: 'Resources',
       path: '/Resources',
     },
+    {
+      key: 'imports',
+      icon: 'upload',
+      name: 'Imports',
+      path: '/Imports',
+    },
   ],
   title: 'Challenge',
   maxElementsResult: 100,

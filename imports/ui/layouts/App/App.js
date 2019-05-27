@@ -14,6 +14,7 @@ import Loading from '../../components/PageLoading';
 
 const ResourcesPage = React.lazy(() => import('../../pages/Resources'));
 const LoginPage = React.lazy(() => import('../../pages/login'));
+const ImportsPage = React.lazy(() => import('../../pages/Imports'));
 const ExecutionsPage = React.lazy(() => import('../../pages/Executions'));
 const ListsPage = React.lazy(() => import('../../pages/Lists'));
 
@@ -144,6 +145,11 @@ class App extends React.Component {
                   exact
                   path="/Executions"
                   render={() => <ExecutionsPage />}
+                />
+                <Route
+                  exact
+                  path="/Imports"
+                  render={() => <ImportsPage />}
                 />
               </Switch>
             </React.Suspense>
