@@ -275,6 +275,8 @@ export default ({
     return res;
   };
 
+  const currentResource = list[currentIndex];
+
   return (
     <Modal
       visible={showModal}
@@ -294,9 +296,10 @@ export default ({
           />
         ) : viewMode == RESULT_MODE ? (
           <Result {...stats} />
-        ) : list.length > 0 ? (
+        ) : currentResource ? (
           <Content
-            result={list[currentIndex]}
+            key={currentResource._id}
+            result={currentResource}
             config={config}
             onResult={handleSaveResult}
           />

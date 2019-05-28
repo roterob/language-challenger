@@ -25,10 +25,12 @@ export default ({
       }
 
       //inject _id
-      values['_id'] = list ? list._id : data[currentIndex]._id;
+      const listValues = { ...values };
+      listValues._id = list ? list._id : data[currentIndex]._id;
+      listValues.resources = values.resources.map(r => r._id);
 
       setIsSaving(true);
-      onSave(values, error => {
+      onSave(listValues, error => {
         setIsSaving(false);
         return true;
       });

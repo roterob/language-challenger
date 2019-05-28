@@ -32,7 +32,7 @@ Meteor.methods({
     const userId = Meteor.userId();
 
     try {
-      const stat = ResourceStats.findOne({ userId, resourceId });
+      let stat = ResourceStats.findOne({ userId, resourceId });
       if (!stat) {
         stat = ResourceStats.buildDefault({ userId, resourceId });
       }
