@@ -5,10 +5,30 @@ import FormItem from 'antd/lib/form/FormItem';
 import Radio from 'antd/lib/radio';
 import Switch from 'antd/lib/switch';
 import Icon from 'antd/lib/icon';
+import Divider from 'antd/lib/divider';
 
 import createFormField from '../../../modules/create-form-field';
 
 class ConfigForm extends React.Component {
+  handleAutomaticCheckChange = current => {
+    const { getFieldsValue, setFieldsValue } = this.props.form;
+    const { playQuestion, playAnswer } = getFieldsValue();
+    if (current && !playAnswer && !playQuestion) {
+      setFieldsValue({ playQuestion: true, playAnswer: true });
+    }
+  };
+
+  handlePlayCheckChange = (field, current) => {
+    const { getFieldsValue, setFieldsValue } = this.props.form;
+    const { playAnswer, playQuestion } = {
+      ...getFieldsValue(),
+      [field]: current,
+    };
+    if (!playAnswer && !playQuestion) {
+      setFieldsValue({ automaticMode: false });
+    }
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
@@ -28,6 +48,7 @@ class ConfigForm extends React.Component {
         <FormItem label="Play question?">
           {getFieldDecorator('playQuestion', { valuePropName: 'checked' })(
             <Switch
+              onChange={v => this.handlePlayCheckChange('playQuestion', v)}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
             />,
@@ -36,6 +57,17 @@ class ConfigForm extends React.Component {
         <FormItem label="Play answer?">
           {getFieldDecorator('playAnswer', { valuePropName: 'checked' })(
             <Switch
+              onChange={v => this.handlePlayCheckChange('playAnswer', v)}
+              checkedChildren={<Icon type="check" />}
+              unCheckedChildren={<Icon type="close" />}
+            />,
+          )}
+        </FormItem>
+        <Divider dashed />
+        <FormItem label="Automatic mode?">
+          {getFieldDecorator('automaticMode', { valuePropName: 'checked' })(
+            <Switch
+              onChange={this.handleAutomaticCheckChange}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
             />,

@@ -20,6 +20,15 @@ export const fromField = {
   }),
 };
 
+export const automaticField = {
+  name: 'automatic',
+  type: 'select',
+  options: ['yes'],
+  filter: v => ({
+    'config.automaticMode': v == 'yes',
+  }),
+};
+
 export const execStateField = {
   name: 'state',
   type: 'select',
@@ -30,7 +39,7 @@ export const execStateField = {
 };
 
 export default tags => {
-  const fields = [typeField, fromField, execStateField];
+  const fields = [typeField, fromField, execStateField, automaticField];
   const normalTags = [];
   let res = {};
 

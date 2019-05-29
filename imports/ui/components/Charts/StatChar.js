@@ -2,17 +2,17 @@ import React, { PureComponent } from 'react';
 import { PieChart, Pie, Legend, Cell } from 'recharts';
 
 export default function({ stats, width = 40, height = 30 }) {
-  const COLORS = ['#e8c5c5', '#cae8c5', '#e5e5e5'];
+  const COLORS = ['#cae8c5', '#e8c5c5', '#e5e5e5'];
   const data = [
-    { name: 'incorrect', value: 0 },
     { name: 'correct', value: 0 },
-    { name: 'none', value: 100 },
+    { name: 'incorrect', value: 0 },
+    { name: 'noexecuted', value: 100 },
   ];
 
   if (stats) {
-    data[0].value = stats.incorrect;
-    data[1].value = stats.correct;
-    data[2].value = 0;
+    data[0].value = stats.correct;
+    data[1].value = stats.incorrect;
+    data[2].value = stats.noexecuted || 0;
   }
 
   return (

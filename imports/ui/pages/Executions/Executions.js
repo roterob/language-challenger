@@ -4,7 +4,11 @@ import Avatar from 'antd/lib/avatar';
 
 import PageHeaderWrapper from '../../components/PageHeaderWrapper';
 import SearchTagBar from '../../components/SearchTagBar';
-import { fromField, execStateField } from '../../../modules/build-filters';
+import {
+  fromField,
+  execStateField,
+  automaticField,
+} from '../../../modules/build-filters';
 import ExecutionsTable from './ExecutionsTable';
 import UserStats from './UserStats';
 import ListExecution from '../../components/ListExecution';
@@ -66,7 +70,7 @@ function Executions({
           <SearchTagBar
             tags={filters}
             onChange={onDataQuery}
-            fields={[fromField, execStateField]}
+            fields={[fromField, execStateField, automaticField]}
             autocompleteTags={collectedTags}
           />
         </div>

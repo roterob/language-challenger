@@ -30,12 +30,14 @@ Executions.schema = new SimpleSchema({
   'config.questionLang': { type: String, allowedValues: ['en', 'es'] },
   'config.playQuestion': { type: Boolean, required: true },
   'config.playAnswer': { type: Boolean, required: true },
+  'config.automaticMode': { type: Boolean, required: true },
   currentIndex: { type: Number, required: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
   counts: { type: Object, required: true },
   'counts.correct': { type: Number },
   'counts.incorrect': { type: Number },
+  'counts.noexecuted': { type: Number },
 });
 
 Executions.attachSchema(Executions.schema);

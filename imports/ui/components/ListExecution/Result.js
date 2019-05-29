@@ -3,10 +3,10 @@ import React from 'react';
 import { PieChart, Pie, Legend, Cell } from 'recharts';
 
 export default function({ correct = 0, incorrect = 0, noresults = 0 }) {
-  const COLORS = ['#f5222d', '#52c41a', '#e5e5e5'];
+  const COLORS = ['#52c41a', '#f5222d', '#e5e5e5'];
   const data = [
-    { name: 'incorrect', value: incorrect, label: 'none' },
     { name: 'correct', value: correct },
+    { name: 'incorrect', value: incorrect, label: 'none' },
     { name: 'none', value: noresults },
   ];
 
@@ -28,14 +28,14 @@ export default function({ correct = 0, incorrect = 0, noresults = 0 }) {
           ))}
         </Pie>
       </PieChart>
-      <span style={{ fontSize: 18, fontWeight: 'bold', color: COLORS[1] }}>
+      <span style={{ fontSize: 18, fontWeight: 'bold', color: COLORS[0] }}>
         {correct}
       </span>
       <span
         style={{
           fontSize: 18,
           fontWeight: 'bold',
-          color: COLORS[0],
+          color: COLORS[1],
           paddingLeft: 10,
         }}
       >

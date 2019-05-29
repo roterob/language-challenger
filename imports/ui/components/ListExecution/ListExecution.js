@@ -51,6 +51,7 @@ export default ({
       questionLang: 'es',
       playQuestion: false,
       playAnswer: true,
+      automaticMode: false,
     },
     results = [],
   } = listExecution;
@@ -139,7 +140,7 @@ export default ({
   };
 
   const handleClose = () => {
-    if (listExecution.inProgress) {
+    if (listExecution.inProgress && !listExecution.config.automaticMode) {
       confirm({
         title: 'Are you sure want to exit?',
         content: 'You can continue with the list execution later',

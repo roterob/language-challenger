@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 import Lists from '../Lists/Lists';
 import Executions from './Executions';
 import ListStats from '../Lists/ListStats';
@@ -26,7 +26,7 @@ Meteor.methods({
           currentIndex: 0,
           createdAt: new Date().getTime(),
           updatedAt: new Date().getTime(),
-          counts: { correct: 0, incorrect: 0 },
+          counts: { correct: 0, incorrect: 0, noexecuted: 0 },
         };
 
         execution._id = Executions.insert(execution);
@@ -56,7 +56,7 @@ Meteor.methods({
     result,
   ) {
     check(executionId, String);
-    check(result, { resourceId: String, result: Boolean });
+    check(result, { resourceId: String, result: Match.OneOf(Boolean, null) });
     const userId = Meteor.userId();
     updatedAt = new Date().getTime();
 
@@ -72,7 +72,7 @@ Meteor.methods({
           $set: { 'results.$.result': result.result, currentIndex, updatedAt },
         },
       );
-      if (Meteor.isServer) {
+      if (Meteor.isServer && result.result != null) {
         updateResourceStats(userId, result.resourceId, result.result);
       }
     } catch (exception) {
@@ -87,11 +87,13 @@ Meteor.methods({
     try {
       const execution = Executions.findOne(executionId);
       const { listId } = execution;
-      const counts = { correct: 0, incorrect: 0 };
+      const counts = { correct: 0, incorrect: 0, noexecuted: 0 };
 
       // Updating counters
       execution.results.forEach(r => {
-        if (r.result) {
+        if (r.result == null) {
+          counts.noexecuted += 1;
+        } else if (r.result) {
           counts.correct += 1;
         } else {
           counts.incorrect += 1;
