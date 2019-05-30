@@ -36,8 +36,8 @@ module.exports = {
     },
   ],
   title: 'Challenge',
-  maxElementsResult: 100,
-  maxElementsPage: 50,
+  maxElementsResult: 500,
+  maxElementsPage: 100,
   formItemLayout: {
     labelCol: {
       xs: { span: 24 },

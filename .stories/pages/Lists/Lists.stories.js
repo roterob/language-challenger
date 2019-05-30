@@ -8,7 +8,7 @@ import Lists from '../../../imports/ui/pages/Lists/Lists';
 import dispatchMock from '../../common/dispatch-mock';
 import { lists, userStats } from './data';
 
-const filters = { type: null, tags: [] };
+const filters = [];
 
 storiesOf('pages.Lists', module)
   .add('isLoading', () => (

@@ -106,58 +106,6 @@
   }
 }
 
-.projectList {
-  :global {
-    .ant-card-meta-description {
-      height: 44px;
-      overflow: hidden;
-      color: @text-color-secondary;
-      line-height: 22px;
-    }
-  }
-  .cardTitle {
-    font-size: 0;
-    a {
-      display: inline-block;
-      height: 24px;
-      margin-left: 12px;
-      color: @heading-color;
-      font-size: @font-size-base;
-      line-height: 24px;
-      vertical-align: top;
-      &:hover {
-        color: @primary-color;
-      }
-    }
-  }
-  .projectGrid {
-    width: 33.33%;
-  }
-  .projectItemContent {
-    display: flex;
-    height: 20px;
-    margin-top: 8px;
-    overflow: hidden;
-    font-size: 12px;
-    line-height: 20px;
-    .textOverflow();
-    a {
-      display: inline-block;
-      flex: 1 1 0;
-      color: @text-color-secondary;
-      .textOverflow();
-      &:hover {
-        color: @primary-color;
-      }
-    }
-    .datetime {
-      flex: 0 0 auto;
-      float: right;
-      color: @disabled-color;
-    }
-  }
-}
-
 .datetime {
   color: @disabled-color;
 }

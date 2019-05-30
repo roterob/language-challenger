@@ -8,7 +8,7 @@ import dispatchMock from '../../common/dispatch-mock';
 
 import { executions, userStats } from './data';
 
-const filters = { type: null, tags: [] };
+const filters = [];
 
 storiesOf('pages.Executions', module)
   .add('isLoading', () => (

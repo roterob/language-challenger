@@ -23,7 +23,7 @@ const renderFooter = ({
 }) => {
   return tabList && tabList.length ? (
     <Tabs
-      className={styles.tabs}
+      size="large"
       activeKey={tabActiveKey}
       onChange={key => {
         if (onTabChange) {

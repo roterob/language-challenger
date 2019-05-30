@@ -12,7 +12,7 @@ export const typeField = {
 export const fromField = {
   name: 'from',
   type: 'date',
-  options: ['2 hours ago', 'yesterday', 'last monday'],
+  options: ['2 hours ago', 'yesterday', 'last month'],
   filter: v => ({
     createdAt: {
       $gte: stringToDate(v),
@@ -23,10 +23,25 @@ export const fromField = {
 export const automaticField = {
   name: 'automatic',
   type: 'select',
-  options: ['yes'],
+  options: ['yes', 'no'],
   filter: v => ({
     'config.automaticMode': v == 'yes',
   }),
+};
+
+export const favouriteField = {
+  name: 'favourite',
+  type: 'select',
+  options: ['yes', 'no'],
+  filter: v => {
+    if (v == 'yes') {
+      return { isFavourite: true };
+    } else {
+      return {
+        $or: [{ isFavourite: { $exists: false } }, { isFavourite: false }],
+      };
+    }
+  },
 };
 
 export const execStateField = {
@@ -39,7 +54,13 @@ export const execStateField = {
 };
 
 export default tags => {
-  const fields = [typeField, fromField, execStateField, automaticField];
+  const fields = [
+    typeField,
+    fromField,
+    execStateField,
+    automaticField,
+    favouriteField,
+  ];
   const normalTags = [];
   let res = {};
 

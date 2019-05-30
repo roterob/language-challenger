@@ -27,3 +27,32 @@ Migrations.add({
     Resources.rawCollection().createIndex({ tags: 1 });
   },
 });
+
+Migrations.add({
+  version: 2,
+  name: 'Views',
+  up() {
+    const db = Resources.rawDatabase();
+    db.createCollection('ResourceStatsView', {
+      viewOn: 'ResourceStats',
+      pipeline: [
+        {
+          $lookup: {
+            from: 'Resources',
+            localField: 'resourceId',
+            foreignField: '_id',
+            as: 'resource',
+          },
+        },
+        { $unwind: '$resource' },
+        {
+          $addFields: {
+            type: '$resource.type',
+            tags: '$resource.tags',
+            createdAt: '$lastExec',
+          },
+        },
+      ],
+    });
+  },
+});
