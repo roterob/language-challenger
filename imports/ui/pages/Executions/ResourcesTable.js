@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import moment from 'moment';
 
 import Table from 'antd/lib/table';
 import Tag from 'antd/lib/tag';
@@ -11,6 +12,7 @@ import Icon from 'antd/lib/icon';
 import TypeColors from '../../../modules/type-colors';
 import withIsLoading from '../../components/hoc/with-is-loading';
 
+import ResourceForm from '../Resources/ResourceFormModal';
 import StatChar from '../../components/Charts/StatChar';
 import Time from './Time';
 
@@ -19,13 +21,16 @@ const Column = Table.Column;
 function ResourceTable({
   fetchTimestamp,
   data,
+  tags,
   onTagClick,
-  onEditClick,
   onCreateList,
   onToggleFavourite,
+  onSaveResource,
 }) {
+  const [resourceIndex, setResourceIndex] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const [dataCache, setDataCache] = useState(data);
+  const [sortedInfo, setSortedInfo] = useState({});
 
   useMemo(() => {
     setDataCache(data);
@@ -36,21 +41,39 @@ function ResourceTable({
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedItems(selectedRows);
     },
-    getCheckboxProps: record => ({
-      disabled: record.name === 'Disabled User', // Column configuration not to be checked
-      name: record.name,
-    }),
+  };
+
+  const handleResourceClose = () => {
+    setResourceIndex(null);
   };
 
   const handleCreateList = () => {
     const tags = [];
-    selectedItems.forEach(i => tags.push(...i.tags));
+    const resources = [];
+
+    selectedItems.forEach(s => {
+      tags.push(...s.resource.tags);
+      resources.push(s.resource._id);
+    });
 
     onCreateList({
-      name: '',
+      name: `Resources ${moment().format('MMMM Do YYYY, hh:mm:ss')}`,
       tags: [...new Set(tags)],
-      resources: selectedItems,
+      resources,
     });
+  };
+
+  const handleResourceEdit = (id, resource, index) => {
+    setResourceIndex(index);
+  };
+
+  const handleSaveResource = (resource, callback) => {
+    setDataCache([
+      ...dataCache.slice(0, resourceIndex),
+      { ...dataCache[resourceIndex], resource },
+      ...dataCache.slice(resourceIndex + 1),
+    ]);
+    onSaveResource(resource, callback);
   };
 
   const handleToggleFavourite = (record, index) => {
@@ -62,17 +85,27 @@ function ResourceTable({
     onToggleFavourite(record.resource._id);
   };
 
+  const handleTableChange = (pagination, filters, sorter) => {
+    const { columnKey, order } = sorter;
+    console.log(sorter);
+    setSortedInfo({
+      columnKey,
+      order,
+    });
+  };
+
   return (
     <Card style={{ marginBottom: 24 }} bordered={false}>
       <Row>
         <Col span={12}>{`${selectedItems.length} resources selected`}</Col>
         <Col span={12} style={{ textAlign: 'right' }}>
           <Button
+            icon="play-circle"
             type="primary"
             disabled={selectedItems.length == 0}
             onClick={handleCreateList}
           >
-            Create list
+            Play selected
           </Button>
         </Col>
       </Row>
@@ -82,8 +115,9 @@ function ResourceTable({
           <Table
             rowKey="_id"
             pagination={{ pageSize: 50 }}
-            rowSelection={rowSelection}
             dataSource={dataCache}
+            rowSelection={rowSelection}
+            onChange={handleTableChange}
           >
             <Column
               width={60}
@@ -137,7 +171,12 @@ function ResourceTable({
             />
             <Column
               title="Errors"
+              dataIndex="incorrect"
               width={60}
+              sorter={(a, b) => a.incorrect - b.incorrect}
+              sortOrder={
+                sortedInfo.columnKey === 'incorrect' && sortedInfo.order
+              }
               render={(_, { correct, incorrect, executions }) => (
                 <StatChar stats={{ correct, incorrect, executions }} />
               )}
@@ -149,13 +188,22 @@ function ResourceTable({
               render={(id, record, index) => (
                 <Button
                   icon="edit"
-                  onClick={() => onEditClick(id, record.resource, index)}
+                  onClick={() => handleResourceEdit(id, record, index)}
                 />
               )}
             />
           </Table>
         </Col>
       </Row>
+      {resourceIndex != null && (
+        <ResourceForm
+          data={data.map(d => d.resource)}
+          index={resourceIndex}
+          autocompleteTags={tags}
+          onSave={handleSaveResource}
+          onClose={handleResourceClose}
+        />
+      )}
     </Card>
   );
 }

@@ -11,6 +11,7 @@ const { maxElementsResult } = settings;
 Meteor.publish('executions', function executions(f) {
   const filters = f || {};
   filters.userId = Meteor.userId();
+  filters.listId = { $exists: true };
 
   return Executions.find(filters, {
     limit: maxElementsResult + 1,

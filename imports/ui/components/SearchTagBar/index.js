@@ -12,23 +12,25 @@ export default function({
   size = 'small',
   fields = [],
 }) {
-  const autoCompleteDataSource = [
-    ...fields.map(f => `${f.name}:`),
-    ...autocompleteTags,
-  ];
-
-  const [dataSource, setDataSource] = useState(autoCompleteDataSource);
+  const [dataSource, setDataSource] = useState([]);
   const autoRef = useRef();
   const deletePrevious = useRef(false);
 
-  useMemo(() => {
-    setDataSource([
+  let autoCompleteDataSource = useMemo(() => {
+    const allTags = [
       ...fields
         .filter(f => !tags.some(t => t.startsWith(f.name)))
-        .map(f => `${f.name}:`),
+        .map(f =>
+          f.options && f.options.length > 0
+            ? f.options.map(o => `${f.name}:${o}`)
+            : `${f.name}:`,
+        )
+        .flat(),
       ...autocompleteTags,
-    ]);
-  }, [tags.length, autocompleteTags.length]);
+    ];
+    setDataSource(allTags);
+    return allTags;
+  }, [autocompleteTags.length, fields.length]);
 
   const addTag = tag => {
     if (tag && !tag.endsWith(':') && tags.indexOf(tag) < 0) {

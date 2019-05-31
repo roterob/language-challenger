@@ -26,7 +26,6 @@ export default ({ data, index, autocompleteTags, onSave, onClose }) => {
         if (!error && currentIndex < data.length - 1) {
           setCurrentIndex(currentIndex + 1);
         }
-        return true;
       });
     });
   };

@@ -32,7 +32,6 @@ export default ({
       setIsSaving(true);
       onSave(listValues, error => {
         setIsSaving(false);
-        return true;
       });
     });
   };

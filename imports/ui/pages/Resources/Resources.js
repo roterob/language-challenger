@@ -80,7 +80,7 @@ function Resources({
       if (!err) {
         setList(null);
       } else {
-        return callback(err, res);
+        callback(err, res);
       }
     });
   };

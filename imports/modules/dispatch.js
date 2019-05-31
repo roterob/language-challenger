@@ -14,7 +14,7 @@ function callback(error) {
 
 function handleCustomCallback(error, res, customCallback) {
   const next = customCallback(error, res);
-  if (typeof next === 'boolean' && next) {
+  if (typeof next !== 'boolean' || next) {
     callback(error);
   }
 }

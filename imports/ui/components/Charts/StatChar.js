@@ -34,7 +34,17 @@ export default function({ stats, width = 40, height = 30 }) {
           ))}
         </Pie>
       </PieChart>
-      {stats && <span>{stats.executions}</span>}
+      {stats && (
+        <React.Fragment>
+          <span style={{ color: COLORS[0], fontWeight: 'bold' }}>
+            {stats.correct}
+          </span>
+          &nbsp;/&nbsp;
+          <span style={{ color: COLORS[1], fontWeight: 'bold' }}>
+            {stats.incorrect}
+          </span>
+        </React.Fragment>
+      )}
     </div>
   );
 }

@@ -70,7 +70,6 @@ function Lists({
       if (!err) {
         setExecutionId(res);
       }
-      return true;
     });
   };
 

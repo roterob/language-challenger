@@ -15,7 +15,6 @@ import ExecutionsTable from './ExecutionsTable';
 import ResourcesTable from './ResourcesTable';
 import UserStats from './UserStats';
 import ListExecution from '../../components/ListExecution';
-import ResourceForm from '../Resources/ResourceFormModal';
 
 import styles from '../index.less';
 
@@ -32,7 +31,6 @@ function Executions({
   onTabChange,
 }) {
   const [executionId, setExecutionId] = useState(null);
-  const [resourceIndex, setResourceIndex] = useState(null);
 
   const collectedTags = useMemo(() => {
     const res = [];
@@ -52,8 +50,6 @@ function Executions({
       if (!err) {
         setExecutionId(res);
       }
-
-      return true;
     });
   };
 
@@ -70,27 +66,15 @@ function Executions({
   };
 
   const handleResourceStartList = list => {
-    dispatch('executions.create', list, (err, res) => {
-      callback(err, res);
-
+    dispatch('executions.startTemp', list, (err, res) => {
       if (!err) {
         setExecutionId(res);
       }
-
-      return true;
     });
-  };
-
-  const handleResourceEdit = (id, resource, index) => {
-    setResourceIndex(index);
   };
 
   const handleResourceSave = (resource, callback) => {
     dispatch('resources.save', resource, callback);
-  };
-
-  const handleResourceClose = () => {
-    setResourceIndex(null);
   };
 
   const getFilterFields = () => {
@@ -137,8 +121,8 @@ function Executions({
         />
       }
     >
-      {activeTab === 'lists' ? (
-        <React.Fragment>
+      <React.Fragment>
+        {activeTab === 'lists' ? (
           <ExecutionsTable
             data={data}
             isLoading={isLoading}
@@ -148,36 +132,26 @@ function Executions({
             onStartList={handleStartList}
             onReviewList={handleReviewList}
           />
-          {executionId != null && (
-            <ListExecution
-              executionId={executionId}
-              onClose={handleExecutionClose}
-            />
-          )}
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
+        ) : (
           <ResourcesTable
             data={data}
             isLoading={isLoading}
             fetchTimestamp={fetchTimestamp}
             showSpin
+            tags={collectedTags}
             onTagClick={handleTagClick}
-            onEditClick={handleResourceEdit}
             onCreateList={handleResourceStartList}
             onToggleFavourite={handleResourceToggleFav}
+            onSaveResource={handleResourceSave}
           />
-          {resourceIndex != null && (
-            <ResourceForm
-              data={data.map(d => d.resource)}
-              index={resourceIndex}
-              autocompleteTags={collectedTags}
-              onSave={handleResourceSave}
-              onClose={handleResourceClose}
-            />
-          )}
-        </React.Fragment>
-      )}
+        )}
+        {executionId != null && (
+          <ListExecution
+            executionId={executionId}
+            onClose={handleExecutionClose}
+          />
+        )}
+      </React.Fragment>
     </PageHeaderWrapper>
   );
 }

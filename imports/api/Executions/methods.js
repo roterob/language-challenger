@@ -36,6 +36,27 @@ Meteor.methods({
       handleMethodException(exception);
     }
   },
+  'executions.startTemp': function listsStartExecution(list) {
+    check(list, { name: String, tags: [String], resources: [String] });
+    const userId = Meteor.userId();
+
+    try {
+      const execution = {
+        userId,
+        name: list.name,
+        tags: list.tags,
+        inProgress: true,
+        results: list.resources.map(r => ({ resourceId: r, result: null })),
+        currentIndex: 0,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+        counts: { correct: 0, incorrect: 0, noexecuted: 0 },
+      };
+      return Executions.insert(execution);
+    } catch (exception) {
+      handleMethodException(exception);
+    }
+  },
   'executions.saveConfig': function executionsSaveconfig(executionId, config) {
     check(executionId, String);
     check(config, Object);

@@ -54,6 +54,7 @@ function ExecutionsTable({ data, onTagClick, onStartList, onReviewList }) {
               title="Stats"
               dataIndex="counts"
               width={60}
+              align="center"
               render={(counts, record) =>
                 record.inProgress ? (
                   <Tag

@@ -13,7 +13,7 @@ import dispatch from '../../../modules/dispatch';
 
 import buildFilters from '../../../modules/build-filters';
 
-const filtersVar = new ReactiveVar(['from:3 months ago']);
+const filtersVar = new ReactiveVar(['from:last month']);
 const activeTab = new ReactiveVar('lists');
 
 const handleTabChange = tab => {
