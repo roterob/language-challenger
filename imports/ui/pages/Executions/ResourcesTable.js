@@ -30,6 +30,7 @@ function ResourceTable({
   const [resourceIndex, setResourceIndex] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const [dataCache, setDataCache] = useState(data);
+  const [cacheTimestamp, setCacheTimestamp] = useState(new Date().getTime());
   const [sortedInfo, setSortedInfo] = useState({});
 
   useMemo(() => {
@@ -73,6 +74,7 @@ function ResourceTable({
       { ...dataCache[resourceIndex], resource },
       ...dataCache.slice(resourceIndex + 1),
     ]);
+    setCacheTimestamp(new Date().getTime());
     onSaveResource(resource, callback);
   };
 
@@ -82,6 +84,7 @@ function ResourceTable({
       { ...record, isFavourite: !record.isFavourite },
       ...dataCache.slice(index + 1),
     ]);
+    setCacheTimestamp(new Date().getTime());
     onToggleFavourite(record.resource._id);
   };
 
@@ -112,87 +115,92 @@ function ResourceTable({
 
       <Row style={{ marginTop: 12 }}>
         <Col span={24}>
-          <Table
-            rowKey="_id"
-            pagination={{ pageSize: 50 }}
-            dataSource={dataCache}
-            rowSelection={rowSelection}
-            onChange={handleTableChange}
-          >
-            <Column
-              width={60}
-              dataIndex="lastExec"
-              render={date => <Time time={date} />}
-            />
-            <Column
-              dataIndex="isFavourite"
-              width={40}
-              render={(isFavourite, record, index) => (
-                <Icon
-                  onClick={() => handleToggleFavourite(record, index)}
-                  type="star"
-                  theme="filled"
-                  style={{
-                    fontSize: 22,
-                    float: 'right',
-                    cursor: 'pointer',
-                    color: isFavourite ? '#fadb14' : '#e8e8e8',
-                  }}
+          {useMemo(
+            () => (
+              <Table
+                rowKey="_id"
+                pagination={{ pageSize: 50 }}
+                dataSource={dataCache}
+                rowSelection={rowSelection}
+                onChange={handleTableChange}
+              >
+                <Column
+                  width={60}
+                  dataIndex="lastExec"
+                  render={date => <Time time={date} />}
                 />
-              )}
-            />
-            <Column
-              title="Resource"
-              dataIndex="resource.type"
-              render={(text, record) => (
-                <div>
-                  <div>{record.resource.info.en.text}</div>
-                  <div style={{ marginTop: 5 }}>
-                    <Tag
-                      key={text}
-                      color={TypeColors[text]}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => onTagClick(`type:${text}`)}
-                    >
-                      {text.toUpperCase()}
-                    </Tag>
-                    {record.tags.map(tag => (
-                      <Tag
-                        key={tag}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => onTagClick(tag)}
-                      >
-                        {tag}
-                      </Tag>
-                    ))}
-                  </div>
-                </div>
-              )}
-            />
-            <Column
-              title="Errors"
-              dataIndex="incorrect"
-              width={60}
-              sorter={(a, b) => a.incorrect - b.incorrect}
-              sortOrder={
-                sortedInfo.columnKey === 'incorrect' && sortedInfo.order
-              }
-              render={(_, { correct, incorrect, executions }) => (
-                <StatChar stats={{ correct, incorrect, executions }} />
-              )}
-            />
-            <Column
-              title=""
-              dataIndex="_id"
-              width={60}
-              render={(id, record, index) => (
-                <Button
-                  icon="edit"
-                  onClick={() => handleResourceEdit(id, record, index)}
+                <Column
+                  dataIndex="isFavourite"
+                  width={40}
+                  render={(isFavourite, record, index) => (
+                    <Icon
+                      onClick={() => handleToggleFavourite(record, index)}
+                      type="star"
+                      theme="filled"
+                      style={{
+                        fontSize: 22,
+                        float: 'right',
+                        cursor: 'pointer',
+                        color: isFavourite ? '#fadb14' : '#e8e8e8',
+                      }}
+                    />
+                  )}
                 />
-              )}
-            />
-          </Table>
+                <Column
+                  title="Resource"
+                  dataIndex="resource.type"
+                  render={(text, record) => (
+                    <div>
+                      <div>{record.resource.info.en.text}</div>
+                      <div style={{ marginTop: 5 }}>
+                        <Tag
+                          key={text}
+                          color={TypeColors[text]}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => onTagClick(`type:${text}`)}
+                        >
+                          {text.toUpperCase()}
+                        </Tag>
+                        {record.tags.map(tag => (
+                          <Tag
+                            key={tag}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => onTagClick(tag)}
+                          >
+                            {tag}
+                          </Tag>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                />
+                <Column
+                  title="Errors"
+                  dataIndex="incorrect"
+                  width={60}
+                  sorter={(a, b) => a.incorrect - b.incorrect}
+                  sortOrder={
+                    sortedInfo.columnKey === 'incorrect' && sortedInfo.order
+                  }
+                  render={(_, { correct, incorrect, executions }) => (
+                    <StatChar stats={{ correct, incorrect, executions }} />
+                  )}
+                />
+                <Column
+                  title=""
+                  dataIndex="_id"
+                  width={60}
+                  render={(id, record, index) => (
+                    <Button
+                      icon="edit"
+                      onClick={() => handleResourceEdit(id, record, index)}
+                    />
+                  )}
+                />
+              </Table>
+            ),
+            [fetchTimestamp, cacheTimestamp],
+          )}
         </Col>
       </Row>
       {resourceIndex != null && (

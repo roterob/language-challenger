@@ -3,6 +3,7 @@ import React from 'react';
 import Form from 'antd/lib/form';
 import FormItem from 'antd/lib/form/FormItem';
 import Select from 'antd/lib/select';
+import Input from 'antd/lib/input';
 
 import createFormField from '../../../modules/create-form-field';
 import TagInput from '../../components/SearchTagBar';
@@ -38,6 +39,11 @@ class ResourceForm extends React.Component {
 
     return (
       <Form>
+        <FormItem {...formItemLayout} label="Code">
+          {getFieldDecorator('resourceCode', {})(
+            <Input width={200} disabled />,
+          )}
+        </FormItem>
         <FormItem {...formItemLayout} label="Type">
           {getFieldDecorator('type', {
             rules: [{ required: true, message: 'Type is required' }],
