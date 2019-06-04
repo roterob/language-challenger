@@ -11,11 +11,11 @@ export default function({ correct = 0, incorrect = 0, noresults = 0 }) {
   ];
 
   return (
-    <div style={{ textAlign: 'center', width: '100%', padding: '20px 0px' }}>
+    <div style={{ textAlign: 'center' }}>
       <PieChart width={400} height={100}>
         <Pie
           data={data}
-          cx={255}
+          cx={200}
           cy={90}
           startAngle={180}
           endAngle={0}

@@ -79,7 +79,7 @@ function Executions({
 
   const getFilterFields = () => {
     let res = [fromField, execStateField, automaticField];
-    if (activeTab !== 'lists') {
+    if (activeTab === 'resources') {
       res = [fromField, typeField, favouriteField];
     }
     return res;

@@ -35,6 +35,7 @@ function ResourceTable({
 
   useMemo(() => {
     setDataCache(data);
+    setCacheTimestamp(new Date().getTime());
   }, [fetchTimestamp]);
 
   // rowSelection object indicates the need for row selection
@@ -95,6 +96,7 @@ function ResourceTable({
       columnKey,
       order,
     });
+    setCacheTimestamp(new Date().getTime());
   };
 
   return (

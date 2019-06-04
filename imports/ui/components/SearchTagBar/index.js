@@ -30,7 +30,7 @@ export default function({
     ];
     setDataSource(allTags);
     return allTags;
-  }, [autocompleteTags.length, fields.length]);
+  }, [autocompleteTags, fields]);
 
   const addTag = tag => {
     if (tag && !tag.endsWith(':') && tags.indexOf(tag) < 0) {
