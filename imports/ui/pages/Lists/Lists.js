@@ -31,7 +31,9 @@ function Lists({
   const dataWithStas = useMemo(() => {
     const statsHashmap = arrayToHashmap('listId', userStats);
     const res = [];
-    data.forEach(l => res.push({ ...l, stats: statsHashmap[l._id] }));
+    data.forEach(l => {
+      res.push({ ...l, stats: statsHashmap[l._id] });
+    });
     return res;
   }, [fetchTimestamp]);
 

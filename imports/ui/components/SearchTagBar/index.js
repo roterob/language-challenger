@@ -5,12 +5,14 @@ import AutoComplete from 'antd/lib/auto-complete';
 import useEventListener from '../use-event-listener';
 import Tag from './Tag';
 
+const EMPTY_ARRAY = [];
+
 export default function({
-  tags = [],
-  autocompleteTags = [],
+  tags = EMPTY_ARRAY,
+  autocompleteTags = EMPTY_ARRAY,
   onChange,
   size = 'small',
-  fields = [],
+  fields = EMPTY_ARRAY,
 }) {
   const [dataSource, setDataSource] = useState([]);
   const autoRef = useRef();
@@ -30,7 +32,7 @@ export default function({
     ];
     setDataSource(allTags);
     return allTags;
-  }, [autocompleteTags, fields]);
+  }, [autocompleteTags, fields, tags]);
 
   const addTag = tag => {
     if (tag && !tag.endsWith(':') && tags.indexOf(tag) < 0) {
