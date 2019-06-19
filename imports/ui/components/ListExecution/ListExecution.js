@@ -164,7 +164,9 @@ export default ({
       }
 
       if (listExecution.inProgress) {
+        console.log(values);
         const newConfig = { ...config, ...values };
+        console.log(newConfig);
         dispatch('executions.saveConfig', listExecution._id, newConfig);
       }
       setViewMode(RUN_MODE);

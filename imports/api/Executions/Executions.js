@@ -30,6 +30,7 @@ Executions.schema = new SimpleSchema({
   'config.questionLang': { type: String, allowedValues: ['en', 'es'] },
   'config.playQuestion': { type: Boolean },
   'config.playAnswer': { type: Boolean },
+  'config.writeAnswer': { type: Boolean },
   'config.automaticMode': { type: Boolean },
   currentIndex: { type: Number },
   createdAt: { type: Date },

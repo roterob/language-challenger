@@ -63,6 +63,17 @@ class ConfigForm extends React.Component {
             />,
           )}
         </FormItem>
+        <FormItem label="Write answer?">
+          {getFieldDecorator('writeAnswer', {
+            valuePropName: 'checked',
+            initialValue: false,
+          })(
+            <Switch
+              checkedChildren={<Icon type="check" />}
+              unCheckedChildren={<Icon type="close" />}
+            />,
+          )}
+        </FormItem>
         <Divider dashed />
         <FormItem label="Automatic mode?">
           {getFieldDecorator('automaticMode', { valuePropName: 'checked' })(

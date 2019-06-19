@@ -41,6 +41,18 @@ storiesOf('components.ListExecution', module)
       dispatch={dispatchMock}
     />
   ))
+  .add('inProgress - writeAnswer', () => (
+    <ListExecution
+      isLoading={false}
+      listExecution={{
+        ...listExecution,
+        config: { ...executionConfig, writeAnswer: true },
+      }}
+      resources={resources}
+      fetchTimestamp={new Date().getTime()}
+      dispatch={dispatchMock}
+    />
+  ))
   .add('finished', () => (
     <ListExecution
       isLoading={false}

@@ -6,6 +6,7 @@ import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
 import Icon from 'antd/lib/icon';
 import Button from 'antd/lib/button';
+import Input from 'antd/lib/input';
 
 import getAudioLink from '../../../modules/get-audio-link';
 import styles from './index.less';
@@ -15,6 +16,7 @@ export default ({ config, result, onResult }) => {
     questionLang,
     playQuestion: autoPlayQuestion,
     playAnswer: autoPlayAnswer,
+    writeAnswer,
     automaticMode,
   } = config;
 
@@ -27,6 +29,7 @@ export default ({ config, result, onResult }) => {
   const [playQuestion, setPlayQuestion] = useState(false);
   const [playAnswer, setPlayAnswer] = useState(false);
   const [pauseAutomatic, setPauseAutomatic] = useState(false);
+  const [userAnswer, setUserAnswer] = useState();
 
   useMemo(() => {
     setRevealAnswer(userResult != null || automaticMode);
@@ -39,6 +42,7 @@ export default ({ config, result, onResult }) => {
         ((!automaticMode && userResult == null) ||
           (automaticMode && !mustAutoPlayQuestion)),
     );
+    setUserAnswer('');
   }, [result.resourceId]);
 
   const handleRevealAnswer = () => {
@@ -98,7 +102,20 @@ export default ({ config, result, onResult }) => {
       </Row>
       <Row>
         <Col span={20} className="left-content">
-          {revealAnswer && <React.Fragment>{answerInfo.text}</React.Fragment>}
+          {revealAnswer && (
+            <React.Fragment>
+              <p>{answerInfo.text}</p>
+              {userAnswer && <p className="user-answer">{userAnswer}</p>}
+            </React.Fragment>
+          )}
+          {!revealAnswer && writeAnswer && (
+            <Input.TextArea
+              autoFocus
+              onChange={e => setUserAnswer(e.target.value)}
+              onPressEnter={e => setRevealAnswer(true)}
+              style={{ height: '100%', textAlign: 'center' }}
+            />
+          )}
         </Col>
         <Col span={4} className="right-content">
           {revealAnswer ? (
