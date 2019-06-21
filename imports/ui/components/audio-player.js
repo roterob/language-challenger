@@ -3,13 +3,16 @@ import ReactAudioPlayer from 'react-audio-player';
 
 import Icon from 'antd/lib/icon';
 
-export default ({ audioLink, play, onPlay, defaultIcon = 'sound' }) => {
+export default ({ audioLink, play, onPlay, onEnd, defaultIcon = 'sound' }) => {
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioLoaded, setAudioLoaded] = useState(false);
 
   const audioRef = useRef();
 
-  const handleEndQuestion = () => setAudioPlaying(false);
+  const handleEndQuestion = () => {
+    onEnd();
+    setAudioPlaying(false);
+  };
 
   const handleCanPlay = () => {
     setAudioPlaying(true);

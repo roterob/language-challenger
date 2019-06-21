@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Input from 'antd/lib/input';
 import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
-import Icon from 'antd/lib/icon';
 
 import AudioPlayer from '../../components/audio-player';
 import getAudioLink from '../../../modules/get-audio-link';
@@ -36,6 +35,7 @@ export default class InfoInput extends React.Component {
         play={playResource === lang}
         onPlay={() => this.setPlayResource(lang)}
         defaultIcon="audio"
+        onEnd={() => {}}
       />
     );
   };

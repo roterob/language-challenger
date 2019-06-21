@@ -89,6 +89,7 @@ export default ({ config, result, onResult }) => {
             audioLink={getAudioLink(questionInfo.audio)}
             play={playQuestion}
             onPlay={() => setPlayQuestion(true)}
+            onEnd={handleEndQuestion}
           />
         </Col>
       </Row>
@@ -115,6 +116,7 @@ export default ({ config, result, onResult }) => {
               audioLink={getAudioLink(answerInfo.audio)}
               play={revealAnswer && playAnswer}
               onPlay={() => setPlayAnswer(true)}
+              onEnd={handleEndAnswer}
             />
           ) : (
             <Icon type="question" onClick={handleRevealAnswer} />

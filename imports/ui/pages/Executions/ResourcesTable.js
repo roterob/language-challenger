@@ -91,7 +91,6 @@ function ResourceTable({
 
   const handleTableChange = (pagination, filters, sorter) => {
     const { columnKey, order } = sorter;
-    console.log(sorter);
     setSortedInfo({
       columnKey,
       order,
