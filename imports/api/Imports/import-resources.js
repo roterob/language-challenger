@@ -54,10 +54,7 @@ export default async (taskId, file) => {
   } catch (e) {
     Tasks.update(taskId, {
       $set: {
-        status: 'finished',
-        updatedAt: new Date(),
-        finishedAt: new Date(),
-        error: e.reason || e,
+        error: e.message || e,
       },
     });
   } finally {

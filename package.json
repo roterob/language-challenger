@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "start": "meteor --settings settings-dev.json",
+    "debug": "meteor debug --inspect-brk=9229",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
