@@ -24,6 +24,7 @@ function Lists({
   hasMore,
   onDataQuery,
   dispatch,
+  isMobile,
 }) {
   const [resourceIndex, setResourceIndex] = useState(null);
   const [executionId, setExecutionId] = useState(null);
@@ -77,9 +78,11 @@ function Lists({
 
   const headerContent = (
     <div className={styles.pageHeaderContent}>
-      <div className={styles.avatar}>
-        <Avatar size={64} icon="bars" />
-      </div>
+      {!isMobile && (
+        <div className={styles.avatar}>
+          <Avatar size={64} icon="bars" />
+        </div>
+      )}
       <div className={styles.content}>
         <div className={styles.contentTitle}>Lists</div>
         <div>

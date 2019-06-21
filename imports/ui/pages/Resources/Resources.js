@@ -22,6 +22,7 @@ function Resources({
   hasMore,
   onDataQuery,
   dispatch,
+  isMobile,
 }) {
   const [resourceIndex, setResourceIndex] = useState(null);
   const [list, setList] = useState(null);
@@ -87,9 +88,11 @@ function Resources({
 
   const headerContent = (
     <div className={styles.pageHeaderContent}>
-      <div className={styles.avatar}>
-        <Avatar size={64} icon="database" />
-      </div>
+      {!isMobile && (
+        <div className={styles.avatar}>
+          <Avatar size={64} icon="database" />
+        </div>
+      )}
       <div className={styles.content}>
         <div className={styles.contentTitle}>Resources</div>
         <div>
@@ -118,7 +121,11 @@ function Resources({
   );
 
   return (
-    <PageHeaderWrapper content={headerContent} extraContent={extraContent}>
+    <PageHeaderWrapper
+      isMobile
+      content={headerContent}
+      extraContent={extraContent}
+    >
       <React.Fragment>
         <Row>
           <Col span={24}>

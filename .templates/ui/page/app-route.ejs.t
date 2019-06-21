@@ -7,5 +7,5 @@ eof_last: false
                 <Route
                   exact
                   path="/<%=name%>"
-                  render={() => <<%=name%>Page />}
+                  render={() => <<%=name%>Page isMobile={isMobile} />}
                 />

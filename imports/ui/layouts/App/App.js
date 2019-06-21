@@ -134,22 +134,30 @@ class App extends React.Component {
           <Content className={styles.content} style={contentStyle}>
             <React.Suspense fallback={<Loading />}>
               <Switch>
-                <Route exact path="/" render={() => <ExecutionsPage />} />
+                <Route
+                  exact
+                  path="/"
+                  render={() => <ExecutionsPage isMobile={isMobile} />}
+                />
                 <Route
                   exact
                   path="/Resources"
-                  render={() => <ResourcesPage />}
+                  render={() => <ResourcesPage isMobile={isMobile} />}
                 />
-                <Route exact path="/Lists" render={() => <ListsPage />} />
+                <Route
+                  exact
+                  path="/Lists"
+                  render={() => <ListsPage isMobile={isMobile} />}
+                />
                 <Route
                   exact
                   path="/Executions"
-                  render={() => <ExecutionsPage />}
+                  render={() => <ExecutionsPage isMobile={isMobile} />}
                 />
                 <Route
                   exact
                   path="/Imports"
-                  render={() => <ImportsPage />}
+                  render={() => <ImportsPage isMobile={isMobile} />}
                 />
               </Switch>
             </React.Suspense>

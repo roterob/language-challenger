@@ -18,7 +18,7 @@ import PageHeaderWrapper from '../../components/PageHeaderWrapper';
 import styles from '../index.less';
 import useTimeout from '../../components/use-timeout';
 
-function Imports({ isLoading, task = {}, onFileSelected }) {
+function Imports({ isLoading, isMobile, task = {}, onFileSelected }) {
   const MIN_TIME_TRANSITION = 1500;
 
   const uploadHandler = useRef();
@@ -64,9 +64,11 @@ function Imports({ isLoading, task = {}, onFileSelected }) {
 
   const headerContent = (
     <div className={styles.pageHeaderContent}>
-      <div className={styles.avatar}>
-        <Avatar size={64} icon="upload" />
-      </div>
+      {!isMobile && (
+        <div className={styles.avatar}>
+          <Avatar size={64} icon="upload" />
+        </div>
+      )}
       <div className={styles.content}>
         <div className={styles.contentTitle}>Resource importing</div>
         <div>

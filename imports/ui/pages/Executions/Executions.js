@@ -29,6 +29,7 @@ function Executions({
   onDataQuery,
   activeTab,
   onTabChange,
+  isMobile,
 }) {
   const [executionId, setExecutionId] = useState(null);
 
@@ -87,9 +88,11 @@ function Executions({
 
   const headerContent = (
     <div className={styles.pageHeaderContent}>
-      <div className={styles.avatar}>
-        <Avatar size={64} icon="thunderbolt" />
-      </div>
+      {!isMobile && (
+        <div className={styles.avatar}>
+          <Avatar size={64} icon="thunderbolt" />
+        </div>
+      )}
       <div className={styles.content}>
         <div className={styles.contentTitle}>My activity</div>
         <div>
@@ -116,6 +119,7 @@ function Executions({
       extraContent={
         <UserStats
           isLoading={isLoading}
+          isMobile={isMobile}
           fetchTimestamp={fetchTimestamp}
           {...userStats}
         />

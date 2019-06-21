@@ -5,14 +5,22 @@ import Stats from '../../components/Charts/StatChar';
 
 import styles from '../index.less';
 
-const UserStats = function({ isLoading, executions, correct, incorrect }) {
+const UserStats = function({
+  isLoading,
+  isMobile,
+  executions,
+  correct,
+  incorrect,
+}) {
   return (
     !isLoading && (
       <div className={styles.extraContent}>
-        <div className={styles.statItem} style={{ textAlign: 'center' }}>
-          <p>Completed</p>
-          <p>{executions}</p>
-        </div>
+        {!isMobile && (
+          <div className={styles.statItem} style={{ textAlign: 'center' }}>
+            <p>Completed</p>
+            <p>{executions}</p>
+          </div>
+        )}
         <div className={styles.statItem}>
           <p>Global</p>
           <Stats stats={{ correct, incorrect }} height={30} />
