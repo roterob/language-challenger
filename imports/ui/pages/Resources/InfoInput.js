@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import ReactAudioPlayer from 'react-audio-player';
 
 import Input from 'antd/lib/input';
 import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
 import Icon from 'antd/lib/icon';
 
+import AudioPlayer from '../../components/audio-player';
 import getAudioLink from '../../../modules/get-audio-link';
 
 // Must be a class. antd form restriction
@@ -28,17 +28,20 @@ export default class InfoInput extends React.Component {
 
   getPlayButton = lang => {
     const { playResource } = this.state;
+    const { value: info } = this.props;
+
     return (
-      <Icon
-        type={playResource === lang ? 'loading' : 'audio'}
-        onClick={() => this.setPlayResource(lang)}
+      <AudioPlayer
+        audioLink={getAudioLink(info[lang].audio)}
+        play={playResource === lang}
+        onPlay={() => this.setPlayResource(lang)}
+        defaultIcon="audio"
       />
     );
   };
 
   render() {
     const { value: info } = this.props;
-    const { playResource } = this.state;
 
     return (
       <React.Fragment>
@@ -61,15 +64,6 @@ export default class InfoInput extends React.Component {
                 }
                 addonAfter={this.getPlayButton(lang)}
               />
-              {playResource == lang && (
-                <ReactAudioPlayer
-                  src={getAudioLink(info[lang].audio)}
-                  autoPlay
-                  controls={false}
-                  onEnded={() => this.setPlayResource(null)}
-                  onError={() => this.setPlayResource(null)}
-                />
-              )}
             </Col>
           </Row>
         ))}

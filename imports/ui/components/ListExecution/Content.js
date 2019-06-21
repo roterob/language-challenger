@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import classNames from 'classnames';
-import ReactAudioPlayer from 'react-audio-player';
 
 import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
@@ -9,6 +8,7 @@ import Button from 'antd/lib/button';
 import Input from 'antd/lib/input';
 
 import getAudioLink from '../../../modules/get-audio-link';
+import AudioPlayer from '../audio-player';
 import styles from './index.less';
 
 export default ({ config, result, onResult }) => {
@@ -85,19 +85,11 @@ export default ({ config, result, onResult }) => {
           {questionInfo.text}
         </Col>
         <Col span={4} className="right-content">
-          <Icon
-            type={playQuestion ? 'loading' : 'sound'}
-            onClick={() => setPlayQuestion(true)}
+          <AudioPlayer
+            audioLink={getAudioLink(questionInfo.audio)}
+            play={playQuestion}
+            onPlay={() => setPlayQuestion(true)}
           />
-          {playQuestion && (
-            <ReactAudioPlayer
-              src={getAudioLink(questionInfo.audio)}
-              autoPlay
-              controls={false}
-              onEnded={handleEndQuestion}
-              onError={handleEndQuestion}
-            />
-          )}
         </Col>
       </Row>
       <Row>
@@ -119,21 +111,11 @@ export default ({ config, result, onResult }) => {
         </Col>
         <Col span={4} className="right-content">
           {revealAnswer ? (
-            <React.Fragment>
-              <Icon
-                type={playAnswer ? 'loading' : 'sound'}
-                onClick={() => setPlayAnswer(true)}
-              />
-              {revealAnswer && playAnswer && (
-                <ReactAudioPlayer
-                  src={getAudioLink(answerInfo.audio)}
-                  autoPlay
-                  controls={false}
-                  onEnded={handleEndAnswer}
-                  onError={handleEndAnswer}
-                />
-              )}
-            </React.Fragment>
+            <AudioPlayer
+              audioLink={getAudioLink(answerInfo.audio)}
+              play={revealAnswer && playAnswer}
+              onPlay={() => setPlayAnswer(true)}
+            />
           ) : (
             <Icon type="question" onClick={handleRevealAnswer} />
           )}
