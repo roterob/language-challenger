@@ -23,6 +23,7 @@ ResourceStats.schema = new SimpleSchema({
   correct: { type: Number, required: true },
   incorrect: { type: Number, required: true },
   lastExec: { type: Date, required: true },
+  lastResult: { type: Boolean },
   isFavourite: { type: Boolean, required: false },
 });
 

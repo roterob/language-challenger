@@ -10,6 +10,7 @@ import {
   automaticField,
   typeField,
   favouriteField,
+  lastResult,
 } from '../../../modules/build-filters';
 import ExecutionsTable from './ExecutionsTable';
 import ResourcesTable from './ResourcesTable';
@@ -81,7 +82,7 @@ function Executions({
   const getFilterFields = () => {
     let res = [fromField, execStateField, automaticField];
     if (activeTab === 'resources') {
-      res = [fromField, typeField, favouriteField];
+      res = [fromField, typeField, favouriteField, lastResult];
     }
     return res;
   };

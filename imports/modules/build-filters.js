@@ -44,6 +44,13 @@ export const favouriteField = {
   },
 };
 
+export const lastResult = {
+  name: 'result',
+  type: 'select',
+  options: ['failed', 'correct'],
+  filter: v => ({ lastResult: v === 'correct' }),
+};
+
 export const execStateField = {
   name: 'state',
   type: 'select',
@@ -60,6 +67,7 @@ export default tags => {
     execStateField,
     automaticField,
     favouriteField,
+    lastResult,
   ];
   const normalTags = [];
   let res = {};

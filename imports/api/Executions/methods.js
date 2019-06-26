@@ -153,6 +153,7 @@ function updateResourceStats(userId, resourceId, result) {
 
   resourceStats.executions += 1;
   resourceStats.lastExec = new Date();
+  resourceStats.lastResult = result;
   if (result) {
     resourceStats.correct += 1;
   } else {

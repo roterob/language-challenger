@@ -98,6 +98,12 @@ function ResourceTable({
     setCacheTimestamp(new Date().getTime());
   };
 
+  const handleResultClick = result => {
+    if (typeof result !== 'undefined') {
+      onTagClick(`result:${result ? 'correct' : 'failed'}`);
+    }
+  };
+
   return (
     <Card style={{ marginBottom: 24 }} bordered={false}>
       <Row>
@@ -173,6 +179,30 @@ function ResourceTable({
                         ))}
                       </div>
                     </div>
+                  )}
+                />
+                <Column
+                  title="Result"
+                  dataIndex="lastResult"
+                  width={60}
+                  render={result => (
+                    <Tag
+                      color={
+                        typeof result == 'undefined'
+                          ? '#ccc'
+                          : result
+                          ? 'green'
+                          : 'red'
+                      }
+                      onClick={() => handleResultClick(result)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {typeof result == 'undefined'
+                        ? 'None'
+                        : result
+                        ? 'Correct'
+                        : 'Failed'}
+                    </Tag>
                   )}
                 />
                 <Column

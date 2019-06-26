@@ -2,6 +2,7 @@ import { Migrations } from 'meteor/percolate:migrations';
 import { Accounts } from 'meteor/accounts-base';
 
 import Resources from '../../api/Resources/Resources';
+import ResourceStats from '../../api/Resources/ResourceStats';
 
 Migrations.add({
   version: 1,
@@ -53,6 +54,17 @@ Migrations.add({
           },
         },
       ],
+    });
+  },
+});
+
+Migrations.add({
+  version: 3,
+  name: 'Fixes 1',
+  up() {
+    ResourceStats.find().forEach(function(item) {
+      item.lastResult = item.correct > 0 && item.incorrect == 0;
+      ResourceStats.update(item._id, { $set: item });
     });
   },
 });
