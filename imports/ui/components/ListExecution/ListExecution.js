@@ -165,9 +165,12 @@ export default ({
 
       if (listExecution.inProgress) {
         const newConfig = { ...config, ...values };
-        dispatch('executions.saveConfig', listExecution._id, newConfig);
+        dispatch('executions.saveConfig', listExecution._id, newConfig, () =>
+          setViewMode(RUN_MODE),
+        );
+      } else {
+        setViewMode(RUN_MODE);
       }
-      setViewMode(RUN_MODE);
     });
   };
 

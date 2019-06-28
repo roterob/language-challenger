@@ -17,14 +17,14 @@ ResourceStats.deny({
 });
 
 ResourceStats.schema = new SimpleSchema({
-  userId: { type: String, required: true },
-  resourceId: { type: String, required: true },
-  executions: { type: Number, required: true },
-  correct: { type: Number, required: true },
-  incorrect: { type: Number, required: true },
-  lastExec: { type: Date, required: true },
-  lastResult: { type: Boolean },
-  isFavourite: { type: Boolean, required: false },
+  userId: { type: String },
+  resourceId: { type: String },
+  executions: { type: Number },
+  correct: { type: Number },
+  incorrect: { type: Number },
+  lastExec: { type: Date },
+  lastResult: { type: Boolean, optional: true },
+  isFavourite: { type: Boolean, optional: true },
 });
 
 ResourceStats.buildDefault = function(initObj) {

@@ -36,6 +36,7 @@ export default ({ config, result, onResult }) => {
 
     const mustAutoPlayQuestion =
       autoPlayQuestion && (userResult == null || automaticMode);
+
     setPlayQuestion(mustAutoPlayQuestion);
     setPlayAnswer(
       autoPlayAnswer &&
