@@ -87,6 +87,7 @@ export default ({ config, result, onResult }) => {
         </Col>
         <Col span={4} className="right-content">
           <AudioPlayer
+            key={`${result.resourceId}_${questionLang}`}
             audioLink={getAudioLink(questionInfo.audio)}
             play={playQuestion}
             onPlay={() => setPlayQuestion(true)}
@@ -114,6 +115,7 @@ export default ({ config, result, onResult }) => {
         <Col span={4} className="right-content">
           {revealAnswer ? (
             <AudioPlayer
+              key={`${result.resourceId}_${answerLang}`}
               audioLink={getAudioLink(answerInfo.audio)}
               play={revealAnswer && playAnswer}
               onPlay={() => setPlayAnswer(true)}
