@@ -4,9 +4,13 @@ import chrono from 'chrono-node';
 export const stringToMoment = value => {
   let res = null;
   if (typeof value === 'string') {
-    const result = chrono.parseDate(value);
-    if (result) {
-      res = moment(result, 'DD/MM/YY');
+    if (stringIsDate(value)) {
+      res = moment(value, 'DD/MM/YY');
+    } else {
+      const result = chrono.parseDate(value);
+      if (result) {
+        res = moment(result);
+      }
     }
   } else if (value) {
     res = moment(value);
