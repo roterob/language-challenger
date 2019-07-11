@@ -15,15 +15,48 @@ const Column = Table.Column;
 
 function ListTable({ data, onTagClick, onEditClick, onStartList }) {
   const [startListId, setStartListId] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
+
   const handleStartList = id => {
     setStartListId(id);
     onStartList(id, () => setStartListId(null));
   };
+
+  const handleRowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedItems(selectedRows);
+    },
+  };
+
+  const handleExecuteLists = () => {
+    const ids = selectedItems.map(i => i._id);
+    setStartListId('0');
+    onStartList(ids, () => setStartListId(null));
+  };
+
   return (
     <Card style={{ marginBottom: 24 }} bordered={false}>
+      <Row>
+        <Col span={12}>{`${selectedItems.length} lists selected`}</Col>
+        <Col span={12} style={{ textAlign: 'right' }}>
+          <Button
+            type="primary"
+            disabled={selectedItems.length == 0}
+            onClick={handleExecuteLists}
+            loading={startListId === '0'}
+          >
+            Execute lists
+          </Button>
+        </Col>
+      </Row>
       <Row style={{ marginTop: 12 }}>
         <Col span={24}>
-          <Table rowKey="_id" pagination={{ pageSize: 50 }} dataSource={data}>
+          <Table
+            rowKey="_id"
+            pagination={{ pageSize: 50 }}
+            rowSelection={handleRowSelection}
+            dataSource={data}
+          >
             <Column
               title="List"
               dataIndex="name"

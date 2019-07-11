@@ -9,20 +9,42 @@ import handleMethodException from '../../modules/handle-method-exception';
 
 Meteor.methods({
   'executions.start': function listsStartExecution(listId) {
-    check(listId, String);
+    check(listId, Match.OneOf(String, [String]));
     const userId = Meteor.userId();
 
+    if (Meteor.isClient) {
+      return;
+    }
+
+    let executionListId = listId;
+    let listIds = listId instanceof Array ? listId : [listId];
+
+    executionListId = listIds.join('_');
+
     try {
-      let execution = Executions.findOne({ listId, userId, inProgress: true });
+      let execution = Executions.findOne({
+        listId: executionListId,
+        userId,
+        inProgress: true,
+      });
       if (!execution) {
-        const list = Lists.findOne(listId);
+        const lists = Lists.find({ _id: { $in: listIds } }).fetch();
         execution = {
           userId,
-          listId,
-          name: list.name,
-          tags: list.tags,
+          listId: executionListId,
+          name: lists.map(l => l.name).join(' & '),
+          tags: _.chain(lists)
+            .map(l => l.tags)
+            .flatten()
+            .uniq()
+            .value(),
           inProgress: true,
-          results: list.resources.map(r => ({ resourceId: r, result: null })),
+          results: _.chain(lists)
+            .map(l => l.resources)
+            .flatten()
+            .uniq()
+            .map(r => ({ resourceId: r, result: null }))
+            .value(),
           currentIndex: 0,
           createdAt: new Date().getTime(),
           updatedAt: new Date().getTime(),
