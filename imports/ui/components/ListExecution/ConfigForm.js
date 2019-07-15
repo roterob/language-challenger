@@ -30,11 +30,12 @@ class ConfigForm extends React.Component {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, getFieldsValue } = this.props.form;
     const formItemLayout = {
       labelCol: { xs: { span: 12 } },
       wrapperCol: { xs: { span: 12 } },
     };
+    const { automaticMode } = getFieldsValue();
     return (
       <Form {...formItemLayout}>
         <FormItem label="Question lang">
@@ -81,6 +82,18 @@ class ConfigForm extends React.Component {
               onChange={this.handleAutomaticCheckChange}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
+            />,
+          )}
+        </FormItem>
+        <FormItem label="Loop mode?">
+          {getFieldDecorator('loopMode', {
+            valuePropName: 'checked',
+          })(
+            <Switch
+              onChange={this.handleAutomaticCheckChange}
+              checkedChildren={<Icon type="check" />}
+              unCheckedChildren={<Icon type="close" />}
+              disabled={!automaticMode}
             />,
           )}
         </FormItem>

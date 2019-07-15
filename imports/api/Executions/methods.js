@@ -48,6 +48,7 @@ Meteor.methods({
           currentIndex: 0,
           createdAt: new Date().getTime(),
           updatedAt: new Date().getTime(),
+          numLoopExecutions: 0,
           counts: { correct: 0, incorrect: 0, noexecuted: 0 },
         };
 
@@ -101,7 +102,7 @@ Meteor.methods({
     check(executionId, String);
     check(result, { resourceId: String, result: Match.OneOf(Boolean, null) });
     const userId = Meteor.userId();
-    updatedAt = new Date().getTime();
+    const updatedAt = new Date().getTime();
 
     try {
       Executions.update(
@@ -118,6 +119,30 @@ Meteor.methods({
       if (Meteor.isServer && result.result != null) {
         updateResourceStats(userId, result.resourceId, result.result);
       }
+    } catch (exception) {
+      handleMethodException(exception);
+    }
+  },
+  'executions.restart': function executionRestart(executionId) {
+    check(executionId, String);
+
+    try {
+      const execution = Executions.findOne(executionId);
+      const numLoopExecutions = (execution.numLoopExecutions || 1) + 1;
+      const userId = Meteor.userId();
+      const currentIndex = 0;
+      const updatedAt = new Date().getTime();
+
+      Executions.update(
+        {
+          _id: executionId,
+          inProgress: true,
+          userId,
+        },
+        {
+          $set: { numLoopExecutions, currentIndex, updatedAt },
+        },
+      );
     } catch (exception) {
       handleMethodException(exception);
     }

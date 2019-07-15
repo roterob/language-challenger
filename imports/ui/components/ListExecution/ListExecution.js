@@ -16,6 +16,7 @@ import styles from './index.less';
 import arrayToHashmap from '../../../modules/array-to-hashmap';
 
 const confirm = Modal.confirm;
+const MAX_LOOP_EXECUTIONS = 5;
 
 export default ({
   isLoading,
@@ -52,7 +53,9 @@ export default ({
       playQuestion: false,
       playAnswer: true,
       automaticMode: false,
+      loopMode: false,
     },
+    numLoopExecutions = 0,
     results = [],
   } = listExecution;
 
@@ -92,9 +95,14 @@ export default ({
 
   const goNext = () => {
     if (currentIndex == list.length - 1) {
-      dispatch('executions.finish', listExecution._id);
-      setCurrentIndex(0);
-      setViewMode(RESULT_MODE);
+      if (config.loopMode && numLoopExecutions < MAX_LOOP_EXECUTIONS) {
+        dispatch('executions.restart', listExecution._id);
+        setCurrentIndex(0);
+      } else {
+        dispatch('executions.finish', listExecution._id);
+        setCurrentIndex(0);
+        setViewMode(RESULT_MODE);
+      }
     } else {
       setCurrentIndex(currentIndex + 1);
     }
@@ -140,7 +148,11 @@ export default ({
   };
 
   const handleClose = () => {
-    if (listExecution.inProgress && !listExecution.config.automaticMode) {
+    if (
+      listExecution.inProgress &&
+      listExecution.config &&
+      !listExecution.config.automaticMode
+    ) {
       confirm({
         title: 'Are you sure want to exit?',
         content: 'You can continue with the list execution later',
