@@ -34,6 +34,7 @@ Executions.schema = new SimpleSchema({
   'config.writeAnswer': { type: Boolean },
   'config.automaticMode': { type: Boolean },
   'config.loopMode': { type: Boolean, defaultValue: false },
+  'config.shuffle': { type: Boolean, defaultValue: false },
   currentIndex: { type: Number },
   createdAt: { type: Date },
   updatedAt: { type: Date },

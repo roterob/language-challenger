@@ -32,7 +32,7 @@ class ConfigForm extends React.Component {
   };
 
   render() {
-    const { getFieldDecorator, getFieldsValue } = this.props.form;
+    const { getFieldDecorator, getFieldsValue, inProgress } = this.props.form;
     const { automaticMode, loopMode } = this.props;
     const formItemLayout = {
       labelCol: { xs: { span: 12 } },
@@ -74,6 +74,17 @@ class ConfigForm extends React.Component {
             <Switch
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
+            />,
+          )}
+        </FormItem>
+        <FormItem label="Shuffle resources?">
+          {getFieldDecorator('shuffle', {
+            valuePropName: 'checked',
+          })(
+            <Switch
+              checkedChildren={<Icon type="check" />}
+              unCheckedChildren={<Icon type="close" />}
+              disabled={inProgress}
             />,
           )}
         </FormItem>

@@ -85,10 +85,17 @@ Meteor.methods({
     check(config, Object);
     const userId = Meteor.userId();
 
+    const execution = Executions.findOne({ _id: executionId, userId });
+    let { results, config: currentConfig } = execution;
+
+    if (!currentConfig && config.shuffle) {
+      results = _.shuffle(results);
+    }
+
     try {
       Executions.update(
         { _id: executionId, inProgress: true, userId },
-        { $set: { config } },
+        { $set: { config, results } },
       );
     } catch (exception) {
       handleMethodException(exception);

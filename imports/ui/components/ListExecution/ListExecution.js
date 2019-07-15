@@ -309,6 +309,7 @@ export default ({
           <Config
             wrappedComponentRef={ref => (formRef.current = ref)}
             {...config}
+            inProgress={list.inProgress}
           />
         ) : viewMode == RESULT_MODE ? (
           <Result {...stats} />
