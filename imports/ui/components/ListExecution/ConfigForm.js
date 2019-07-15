@@ -15,6 +15,8 @@ class ConfigForm extends React.Component {
     const { playQuestion, playAnswer } = getFieldsValue();
     if (current && !playAnswer && !playQuestion) {
       setFieldsValue({ playQuestion: true, playAnswer: true });
+    } else if (!current) {
+      setFieldsValue({ loopMode: false });
     }
   };
 
@@ -31,11 +33,11 @@ class ConfigForm extends React.Component {
 
   render() {
     const { getFieldDecorator, getFieldsValue } = this.props.form;
+    const { automaticMode, loopMode } = this.props;
     const formItemLayout = {
       labelCol: { xs: { span: 12 } },
       wrapperCol: { xs: { span: 12 } },
     };
-    const { automaticMode } = getFieldsValue();
     return (
       <Form {...formItemLayout}>
         <FormItem label="Question lang">
@@ -90,7 +92,6 @@ class ConfigForm extends React.Component {
             valuePropName: 'checked',
           })(
             <Switch
-              onChange={this.handleAutomaticCheckChange}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
               disabled={!automaticMode}
