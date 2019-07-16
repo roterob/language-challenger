@@ -112,7 +112,7 @@ Meteor.methods({
     check(result, {
       resourceId: String,
       result: Match.OneOf(Boolean, null),
-      listId: String,
+      listId: Match.Optional(Match.OneOf(String, undefined)),
     });
     const userId = Meteor.userId();
     const updatedAt = new Date().getTime();
@@ -173,7 +173,7 @@ Meteor.methods({
       // Updating counters
       const counts = {};
       execution.results.forEach(r => {
-        const listCounts = counts[r.listId] || {
+        const listCounts = counts[r.listId || 'tempList'] || {
           correct: 0,
           incorrect: 0,
           noexecuted: 0,
@@ -188,17 +188,26 @@ Meteor.methods({
         counts[r.listId] = listCounts;
       });
 
-      if (Meteor.isServer && listId) {
-        listId.forEach(id => {
-          updateListStats(userId, id, counts[id]);
-        });
-        updateUserStats(userId, counts);
+      const totalCounts = { correct: 0, incorrect: 0 };
+
+      Object.values(counts).forEach(c => {
+        totalCounts.correct += c.correct;
+        totalCounts.incorrect += c.incorrect;
+      });
+
+      if (Meteor.isServer) {
+        if (listId) {
+          listId.forEach(id => {
+            updateListStats(userId, id, counts[id]);
+          });
+        }
+        updateUserStats(userId, totalCounts);
       }
 
       Executions.update(
         { _id: executionId, inProgress: true, userId },
         {
-          $set: { inProgress: false, updateAt, counts, currentIndex: 0 },
+          $set: { inProgress: false, updateAt, totalCounts, currentIndex: 0 },
         },
       );
     } catch (exception) {
@@ -256,15 +265,7 @@ function updateListStats(userId, listId, { correct, incorrect }) {
   ListStats.update({ userId, listId }, { $set: listStats }, { upsert: true });
 }
 
-function updateUserStats(userId, counts) {
-  let correct = 0,
-    incorrect = 0;
-
-  Object.values(counts).forEach(c => {
-    correct += c.correct;
-    incorrect += c.incorrect;
-  });
-
+function updateUserStats(userId, { correct, incorrect }) {
   let userStats = UserStats.findOne({ userId });
 
   if (!userStats) {
