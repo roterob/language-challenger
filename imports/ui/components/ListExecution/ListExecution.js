@@ -135,6 +135,7 @@ export default ({
       const result = {
         resourceId: currentResult.resourceId,
         result: isCorrect,
+        listId: currentResult.listId,
       };
       currentResult.result = isCorrect;
       dispatch(
@@ -257,8 +258,8 @@ export default ({
     let res = null;
     if (!isLoading) {
       let isFavourite = false;
-      if (resources.length > 0 && currentIndex != null) {
-        isFavourite = resources[currentIndex].stats.isFavourite;
+      if (results.length > 0 && currentIndex != null) {
+        isFavourite = results[currentIndex].resource.stats.isFavourite;
       }
       res = (
         <React.Fragment>

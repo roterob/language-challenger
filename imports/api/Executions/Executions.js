@@ -17,7 +17,8 @@ Executions.deny({
 
 Executions.schema = new SimpleSchema({
   userId: { type: String },
-  listId: { type: String, optional: true },
+  listId: { type: Array, optional: true },
+  'listId.$': { type: String },
   name: { type: String },
   tags: { type: Array },
   'tags.$': { type: String },
@@ -26,6 +27,7 @@ Executions.schema = new SimpleSchema({
   results: { type: Array },
   'results.$': { type: Object },
   'results.$.resourceId': { type: String },
+  'results.$.listId': { type: String },
   'results.$.result': { type: Boolean, optional: true },
   config: { type: Object, optional: true },
   'config.questionLang': { type: String, allowedValues: ['en', 'es'] },

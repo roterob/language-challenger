@@ -3,6 +3,7 @@ import { Accounts } from 'meteor/accounts-base';
 
 import Resources from '../../api/Resources/Resources';
 import ResourceStats from '../../api/Resources/ResourceStats';
+import Executions from '../../api/Executions/Executions';
 
 Migrations.add({
   version: 1,
@@ -66,5 +67,27 @@ Migrations.add({
       item.lastResult = item.correct > 0 && item.incorrect == 0;
       ResourceStats.update(item._id, { $set: item });
     });
+  },
+});
+
+Migrations.add({
+  version: 4,
+  name: 'Fixes Executions listIds',
+  up() {
+    Executions.find({}, { fields: { listId: 1 } }).forEach(function(item) {
+      const { _id, listId } = item;
+      if (listId) {
+        const newListId = listId.split('_');
+        Executions.update(_id, { $set: { listId: newListId } });
+      }
+    });
+  },
+});
+
+Migrations.add({
+  version: 5,
+  name: 'Fixes Exectuions results',
+  up() {
+    Executions.remove({ inProgress: true });
   },
 });

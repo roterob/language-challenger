@@ -16,14 +16,11 @@ Meteor.methods({
       return;
     }
 
-    let executionListId = listId;
     let listIds = listId instanceof Array ? listId : [listId];
-
-    executionListId = listIds.join('_');
 
     try {
       let execution = Executions.findOne({
-        listId: executionListId,
+        listId: listIds,
         userId,
         inProgress: true,
       });
@@ -31,7 +28,7 @@ Meteor.methods({
         const lists = Lists.find({ _id: { $in: listIds } }).fetch();
         execution = {
           userId,
-          listId: executionListId,
+          listId: listIds,
           name: lists.map(l => l.name).join(' & '),
           tags: _.chain(lists)
             .map(l => l.tags)
@@ -40,10 +37,14 @@ Meteor.methods({
             .value(),
           inProgress: true,
           results: _.chain(lists)
-            .map(l => l.resources)
+            .map(l =>
+              l.resources.map(r => ({
+                resourceId: r,
+                result: null,
+                listId: l._id,
+              })),
+            )
             .flatten()
-            .uniq()
-            .map(r => ({ resourceId: r, result: null }))
             .value(),
           currentIndex: 0,
           createdAt: new Date().getTime(),
@@ -107,7 +108,12 @@ Meteor.methods({
     result,
   ) {
     check(executionId, String);
-    check(result, { resourceId: String, result: Match.OneOf(Boolean, null) });
+    check(currentIndex, Number);
+    check(result, {
+      resourceId: String,
+      result: Match.OneOf(Boolean, null),
+      listId: String,
+    });
     const userId = Meteor.userId();
     const updatedAt = new Date().getTime();
 
@@ -118,6 +124,7 @@ Meteor.methods({
           inProgress: true,
           userId,
           'results.resourceId': result.resourceId,
+          'results.listId': result.listId,
         },
         {
           $set: { 'results.$.result': result.result, currentIndex, updatedAt },
@@ -162,21 +169,29 @@ Meteor.methods({
     try {
       const execution = Executions.findOne(executionId);
       const { listId } = execution;
-      const counts = { correct: 0, incorrect: 0, noexecuted: 0 };
 
       // Updating counters
+      const counts = {};
       execution.results.forEach(r => {
+        const listCounts = counts[r.listId] || {
+          correct: 0,
+          incorrect: 0,
+          noexecuted: 0,
+        };
         if (r.result == null) {
-          counts.noexecuted += 1;
+          listCounts.noexecuted += 1;
         } else if (r.result) {
-          counts.correct += 1;
+          listCounts.correct += 1;
         } else {
-          counts.incorrect += 1;
+          listCounts.incorrect += 1;
         }
+        counts[r.listId] = listCounts;
       });
 
-      if (Meteor.isServer) {
-        updateListStats(userId, listId, counts);
+      if (Meteor.isServer && listId) {
+        listId.forEach(id => {
+          updateListStats(userId, id, counts[id]);
+        });
         updateUserStats(userId, counts);
       }
 
@@ -241,7 +256,15 @@ function updateListStats(userId, listId, { correct, incorrect }) {
   ListStats.update({ userId, listId }, { $set: listStats }, { upsert: true });
 }
 
-function updateUserStats(userId, { correct, incorrect }) {
+function updateUserStats(userId, counts) {
+  let correct = 0,
+    incorrect = 0;
+
+  Object.values(counts).forEach(c => {
+    correct += c.correct;
+    incorrect += c.incorrect;
+  });
+
   let userStats = UserStats.findOne({ userId });
 
   if (!userStats) {
