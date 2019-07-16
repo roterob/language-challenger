@@ -8,6 +8,7 @@ import Icon from 'antd/lib/icon';
 import Divider from 'antd/lib/divider';
 
 import createFormField from '../../../modules/create-form-field';
+import isNullOrUndefined from '../../../modules/is-null-or-undefined';
 
 class ConfigForm extends React.Component {
   handleAutomaticCheckChange = current => {
@@ -32,12 +33,17 @@ class ConfigForm extends React.Component {
   };
 
   render() {
-    const { getFieldDecorator, getFieldsValue, inProgress } = this.props.form;
+    const { getFieldDecorator, getFieldValue, inProgress } = this.props.form;
     const { automaticMode, loopMode } = this.props;
     const formItemLayout = {
       labelCol: { xs: { span: 12 } },
       wrapperCol: { xs: { span: 12 } },
     };
+
+    const currentAutomaticMode = isNullOrUndefined(
+      getFieldValue('automaticMode'),
+      automaticMode,
+    );
     return (
       <Form {...formItemLayout}>
         <FormItem label="Question lang">
@@ -105,7 +111,7 @@ class ConfigForm extends React.Component {
             <Switch
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              disabled={!automaticMode}
+              disabled={!currentAutomaticMode}
             />,
           )}
         </FormItem>
