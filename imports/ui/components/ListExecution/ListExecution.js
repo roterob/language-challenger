@@ -14,6 +14,7 @@ import Config from './ConfigForm';
 import styles from './index.less';
 
 import arrayToHashmap from '../../../modules/array-to-hashmap';
+import { Tag } from 'antd';
 
 const confirm = Modal.confirm;
 const MAX_LOOP_EXECUTIONS = 5;
@@ -109,8 +110,8 @@ export default ({
   };
 
   const handleToggleFav = () => {
-    if (currentIndex != null && resources.length > 0) {
-      dispatch('resources.toggleFavourite', resources[currentIndex]._id);
+    if (results.length > 0 && currentIndex != null) {
+      dispatch('resources.toggleFavourite', results[currentIndex].resource._id);
     }
   };
 
@@ -258,8 +259,12 @@ export default ({
     let res = null;
     if (!isLoading) {
       let isFavourite = false;
+      let tags = null;
+
       if (results.length > 0 && currentIndex != null) {
-        isFavourite = results[currentIndex].resource.stats.isFavourite;
+        const currentResource = results[currentIndex].resource;
+        isFavourite = currentResource.stats.isFavourite;
+        tags = currentResource.tags;
       }
       res = (
         <React.Fragment>
@@ -269,6 +274,14 @@ export default ({
             <span style={{ marginLeft: 10 }}>{`${currentIndex + 1}/${
               list.length
             }`}</span>
+          )}
+          {tags && (
+            <React.Fragment>
+              &nbsp;-&nbsp;
+              {tags.map(t => (
+                <Tag>{t}</Tag>
+              ))}
+            </React.Fragment>
           )}
           {viewMode == RUN_MODE && (
             <Icon
