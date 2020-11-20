@@ -91,3 +91,24 @@ Migrations.add({
     Executions.remove({ inProgress: true });
   },
 });
+
+Migrations.add({
+  version: 6,
+  name: 'Initial migration',
+  up() {
+    Accounts.createUser({
+      email: 'guest@mail.es',
+      username: 'guest',
+      password: 'guestPass',
+      name: 'Guest',
+      avatar:
+        'https://s3.amazonaws.com/uifaces/faces/twitter/madebybrenton/128.jpg',
+      isAdmin: true,
+      mustChangePass: false,
+      menu: [],
+      uiSettings: {
+        collapsed: false,
+      },
+    });
+  },
+});

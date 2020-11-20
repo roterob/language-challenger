@@ -188,11 +188,12 @@ Meteor.methods({
         counts[r.listId] = listCounts;
       });
 
-      const totalCounts = { correct: 0, incorrect: 0 };
+      const totalCounts = { correct: 0, incorrect: 0, noexecuted: 0 };
 
       Object.values(counts).forEach(c => {
         totalCounts.correct += c.correct;
         totalCounts.incorrect += c.incorrect;
+        totalCounts.noexecuted += c.noexecuted;
       });
 
       if (Meteor.isServer) {
@@ -207,7 +208,7 @@ Meteor.methods({
       Executions.update(
         { _id: executionId, inProgress: true, userId },
         {
-          $set: { inProgress: false, updateAt, totalCounts, currentIndex: 0 },
+          $set: { inProgress: false, updateAt, counts: totalCounts, currentIndex: 0 },
         },
       );
     } catch (exception) {
