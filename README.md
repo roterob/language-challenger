@@ -1,6 +1,6 @@
 # language-challenger
 
-## Install
+## Installation
 
 * Install [meteor](https://www.meteor.com/)
 * Clone the repostory
