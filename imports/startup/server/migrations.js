@@ -13,7 +13,7 @@ Migrations.add({
     Accounts.createUser({
       email: 'admin@mail.es',
       username: 'admin',
-      password: 'adminPass',
+      password: 'secret',
       name: 'Administrator',
       avatar:
         'https://s3.amazonaws.com/uifaces/faces/twitter/madebybrenton/128.jpg',
@@ -99,7 +99,7 @@ Migrations.add({
     Accounts.createUser({
       email: 'guest@mail.es',
       username: 'guest',
-      password: 'guestPass',
+      password: 'secret',
       name: 'Guest',
       avatar:
         'https://s3.amazonaws.com/uifaces/faces/twitter/madebybrenton/128.jpg',
