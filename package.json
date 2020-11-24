@@ -28,6 +28,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "meteor-azure": "^2.1.2",
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
