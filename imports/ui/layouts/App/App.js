@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import Media from 'react-media';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
@@ -137,8 +137,9 @@ class App extends React.Component {
                 <Route
                   exact
                   path="/"
-                  render={() => <ExecutionsPage isMobile={isMobile} />}
-                />
+                >
+                  <Redirect to="/Executions" />
+                </Route>
                 <Route
                   exact
                   path="/Resources"

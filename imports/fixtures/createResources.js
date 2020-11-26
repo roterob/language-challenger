@@ -12,6 +12,7 @@ export default () => {
   if (Resources.find().count() == 0) {
     for (let i = 0; i < 200; i++) {
       const resource = {
+        resourceCode: `code${i}`,
         type: faker.random.arrayElement(['vocabulary', 'phrase', 'paragraph']),
         tags: generateTags(),
         info: {
