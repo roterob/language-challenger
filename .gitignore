@@ -2,5 +2,7 @@ node_modules/
 settings-dev.json
 settings-staging.json
 settings-production.json
+deploy-settings.json
 .vscode
+.meteor
 debug.log
