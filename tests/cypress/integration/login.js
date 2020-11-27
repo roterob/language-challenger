@@ -1,21 +1,9 @@
-const { expect } = require("chai");
 const { describe } = require("mocha");
-
-const ui = {
-  userName: "input#userName[type=text]",
-  password: "input#password[type=password]",
-  remmember: "input#remember[type=checkbox]",
-  submit: "button.ant-btn[type=submit]",
-  forgotPassword: ".login-form-forgot",
-  errorBox: ".ant-alert-error",
-  errorType: ".ant-alert-message",
-  errorDescription: ".ant-alert-description",
-  profileName: "._imports_ui_components_GlobalHeader__index__name"
-}
+const { login: ui } = require("../helpers/pages");
 
 describe("application access", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/");
+    cy.visitApp();
   });
 
   it("should show the login interface", () => {
