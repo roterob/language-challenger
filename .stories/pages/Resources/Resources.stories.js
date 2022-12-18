@@ -9,7 +9,7 @@ import dispatchMock from '../../common/dispatch-mock';
 
 import data from './data';
 
-const filters = { type: null, tags: [] };
+const filters = [];
 
 storiesOf('pages.Resources', module)
   .add('isLoading', () => (

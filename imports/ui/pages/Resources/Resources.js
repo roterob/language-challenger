@@ -68,6 +68,10 @@ function Resources({
     setResourceIndex(index);
   };
 
+  const handleCreateResource = () => {
+    setResourceIndex(-1);
+  }
+
   const handleCreateList = list => {
     setList(list);
   };
@@ -138,6 +142,7 @@ function Resources({
               onTypeClick={handleTypeClick}
               onEditClick={handleEditResource}
               onCreateList={handleCreateList}
+              onCreateResource={handleCreateResource}
             />
           </Col>
         </Row>

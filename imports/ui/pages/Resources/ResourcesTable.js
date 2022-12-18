@@ -18,6 +18,7 @@ function ResourceTable({
   onTagClick,
   onEditClick,
   onCreateList,
+  onCreateResource,
 }) {
   const [selectedItems, setSelectedItems] = useState([]);
 
@@ -54,6 +55,13 @@ function ResourceTable({
             onClick={handleCreateList}
           >
             Create list
+          </Button>
+          <Button
+            type="primary"
+            onClick={onCreateResource}
+            style={{ marginLeft: 15 }}
+          >
+            Add new
           </Button>
         </Col>
       </Row>
