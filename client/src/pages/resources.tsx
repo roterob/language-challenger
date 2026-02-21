@@ -2,8 +2,9 @@ import { useState, useMemo } from 'react';
 import { Plus, Trash2, Star, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth-context';
-import { useResources, useDeleteResource, useToggleFavourite } from '@/hooks/use-resources';
+import { useResources, useDeleteResource, useToggleFavourite, useResourceTags } from '@/hooks/use-resources';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -24,6 +25,7 @@ export function ResourcesPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
 
@@ -33,11 +35,14 @@ export function ResourcesPage() {
       limit: PAGE_SIZE,
       ...(search && { search }),
       ...(typeFilter && { type: typeFilter }),
+      ...(tagFilter.length > 0 && { tags: tagFilter.join(',') }),
     }),
-    [page, search, typeFilter],
+    [page, search, typeFilter, tagFilter],
   );
 
   const { data, isLoading } = useResources(params);
+  const { data: tagsData } = useResourceTags();
+  const availableTags = tagsData?.tags ?? [];
   const deleteResource = useDeleteResource();
   const toggleFav = useToggleFavourite();
 
@@ -108,6 +113,26 @@ export function ResourcesPage() {
           </SelectContent>
         </Select>
       </div>
+      {availableTags.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-sm text-muted-foreground font-medium">Tags:</span>
+          {availableTags.map((tag) => (
+            <Badge
+              key={tag}
+              variant={tagFilter.includes(tag) ? 'default' : 'outline'}
+              className="cursor-pointer select-none"
+              onClick={() => {
+                setTagFilter((prev) =>
+                  prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+                );
+                setPage(1);
+              }}
+            >
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      )}
 
       {/* Tabla */}
       <div className="rounded-md border">

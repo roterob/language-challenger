@@ -164,4 +164,13 @@ export const listsService = {
       position: item.position,
     }));
   },
+
+  getAvailableTags(): string[] {
+    const rows = db.select({ tags: lists.tags }).from(lists).all();
+    const allTags = new Set<string>();
+    for (const row of rows) {
+      parseTags(row.tags).forEach((t) => allTags.add(t));
+    }
+    return Array.from(allTags).sort();
+  },
 };

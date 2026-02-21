@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, PlayCircle, ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { useLists, useListResources } from '@/hooks/use-lists';
+import { useLists, useListResources, useListTags } from '@/hooks/use-lists';
 import { useStartExecution } from '@/hooks/use-executions';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ export function ListsPage() {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [editingList, setEditingList] = useState<ListWithStats | null>(null);
   const [loadResourcesForId, setLoadResourcesForId] = useState<string>();
@@ -24,11 +25,18 @@ export function ListsPage() {
   const [executionOpen, setExecutionOpen] = useState(false);
 
   const params = useMemo(
-    () => ({ page, limit: PAGE_SIZE, ...(search && { search }) }),
-    [page, search],
+    () => ({
+      page,
+      limit: PAGE_SIZE,
+      ...(search && { search }),
+      ...(tagFilter.length > 0 && { tags: tagFilter.join(',') }),
+    }),
+    [page, search, tagFilter],
   );
 
   const { data, isLoading } = useLists(params);
+  const { data: tagsData } = useListTags();
+  const availableTags = tagsData?.tags ?? [];
   const { data: existingRes } = useListResources(loadResourcesForId);
   const startExecution = useStartExecution();
 
@@ -69,17 +77,39 @@ export function ListsPage() {
         )}
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar listas…"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          className="pl-9"
-        />
+      <div className="space-y-3">
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar listas…"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="pl-9"
+          />
+        </div>
+        {availableTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm text-muted-foreground font-medium">Tags:</span>
+            {availableTags.map((tag) => (
+              <Badge
+                key={tag}
+                variant={tagFilter.includes(tag) ? 'default' : 'outline'}
+                className="cursor-pointer select-none"
+                onClick={() => {
+                  setTagFilter((prev) =>
+                    prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+                  );
+                  setPage(1);
+                }}
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

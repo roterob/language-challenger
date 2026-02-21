@@ -41,6 +41,12 @@ resourcesRoutes.get('/stats', async (c) => {
   return c.json(result);
 });
 
+// GET /api/resources/tags
+resourcesRoutes.get('/tags', async (c) => {
+  const tags = resourcesService.getAvailableTags();
+  return c.json({ tags });
+});
+
 // GET /api/resources/:id
 resourcesRoutes.get('/:id', async (c) => {
   const id = c.req.param('id');

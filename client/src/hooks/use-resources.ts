@@ -88,3 +88,11 @@ export function useToggleFavourite() {
     },
   });
 }
+
+export function useResourceTags() {
+  return useQuery({
+    queryKey: ['resourceTags'],
+    queryFn: () => api.get<{ tags: string[] }>('/resources/tags'),
+    staleTime: 5 * 60_000,
+  });
+}

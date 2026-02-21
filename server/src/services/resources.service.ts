@@ -244,4 +244,13 @@ export const resourcesService = {
       total: countResult?.count ?? 0,
     };
   },
+
+  getAvailableTags(): string[] {
+    const rows = db.select({ tags: resources.tags }).from(resources).all();
+    const allTags = new Set<string>();
+    for (const row of rows) {
+      parseTags(row.tags).forEach((t) => allTags.add(t));
+    }
+    return Array.from(allTags).sort();
+  },
 };

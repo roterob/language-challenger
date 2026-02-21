@@ -22,6 +22,12 @@ listsRoutes.get('/', async (c) => {
   return c.json(result);
 });
 
+// GET /api/lists/tags
+listsRoutes.get('/tags', async (c) => {
+  const tags = listsService.getAvailableTags();
+  return c.json({ tags });
+});
+
 // GET /api/lists/:id
 listsRoutes.get('/:id', async (c) => {
   const id = c.req.param('id');

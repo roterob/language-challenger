@@ -53,3 +53,11 @@ export function useSaveList() {
     },
   });
 }
+
+export function useListTags() {
+  return useQuery({
+    queryKey: ['listTags'],
+    queryFn: () => api.get<{ tags: string[] }>('/lists/tags'),
+    staleTime: 5 * 60_000,
+  });
+}
