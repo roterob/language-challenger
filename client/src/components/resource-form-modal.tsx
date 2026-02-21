@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { saveResourceSchema } from '@language-challenger/shared';
@@ -9,6 +9,7 @@ import { useSaveResource } from '@/hooks/use-resources';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AudioPlayer } from '@/components/audio-player';
 import {
   Dialog,
   DialogContent,
@@ -47,22 +48,55 @@ export function ResourceFormModal({ open, onOpenChange, resource }: ResourceForm
     resolver: zodResolver(saveResourceSchema),
     defaultValues: resource
       ? {
-          type: resource.type as 'phrase' | 'vocabulary' | 'paragraph',
-          contentEs: resource.contentEs,
-          contentEn: resource.contentEn,
+          code: resource.code,
+          type: resource.type,
+          contentEs: resource.contentEs ?? '',
+          contentEsAudio: resource.contentEsAudio ?? '',
+          contentEn: resource.contentEn ?? '',
+          contentEnAudio: resource.contentEnAudio ?? '',
           tags: resource.tags || [],
-          audioId: resource.audioId || undefined,
         }
       : {
-          type: 'phrase',
+          code: '',
+          type: 'phrase' as const,
           contentEs: '',
+          contentEsAudio: '',
           contentEn: '',
+          contentEnAudio: '',
           tags: [],
         },
   });
 
   const [tagInput, setTagInput] = useState('');
   const tags = watch('tags') || [];
+
+  // Reinicializar el formulario cuando cambia el recurso o se abre el modal
+  useEffect(() => {
+    if (open) {
+      reset(
+        resource
+          ? {
+              code: resource.code,
+              type: resource.type,
+              contentEs: resource.contentEs ?? '',
+              contentEsAudio: resource.contentEsAudio ?? '',
+              contentEn: resource.contentEn ?? '',
+              contentEnAudio: resource.contentEnAudio ?? '',
+              tags: resource.tags || [],
+            }
+          : {
+              code: '',
+              type: 'phrase' as const,
+              contentEs: '',
+              contentEsAudio: '',
+              contentEn: '',
+              contentEnAudio: '',
+              tags: [],
+            },
+      );
+      setTagInput('');
+    }
+  }, [open, resource]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -119,11 +153,25 @@ export function ResourceFormModal({ open, onOpenChange, resource }: ResourceForm
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="code">Código</Label>
+            <Input id="code" {...register('code')} />
+            {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="contentEs">Contenido (Español)</Label>
             <Input id="contentEs" {...register('contentEs')} />
             {errors.contentEs && (
               <p className="text-xs text-destructive">{errors.contentEs.message}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contentEsAudio">Audio Español (Google Drive ID)</Label>
+            <div className="flex gap-2">
+              <Input id="contentEsAudio" {...register('contentEsAudio')} placeholder="Opcional" />
+              <AudioPlayer audioId={watch('contentEsAudio')} compact />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -135,8 +183,11 @@ export function ResourceFormModal({ open, onOpenChange, resource }: ResourceForm
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="audioId">Audio ID (Google Drive)</Label>
-            <Input id="audioId" {...register('audioId')} placeholder="Opcional" />
+            <Label htmlFor="contentEnAudio">Audio Inglés (Google Drive ID)</Label>
+            <div className="flex gap-2">
+              <Input id="contentEnAudio" {...register('contentEnAudio')} placeholder="Opcional" />
+              <AudioPlayer audioId={watch('contentEnAudio')} compact />
+            </div>
           </div>
 
           <div className="space-y-2">
