@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: '.',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -19,16 +19,18 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'cd server && npx tsx src/index.ts',
-      port: 3001,
+      command: 'pnpm --filter @language-challenger/server dev',
+      url: 'http://localhost:3001/api/health',
       reuseExistingServer: !process.env.CI,
       cwd: '..',
+      timeout: 30000,
     },
     {
-      command: 'cd client && npx vite',
-      port: 5173,
+      command: 'pnpm --filter @language-challenger/client dev',
+      url: 'http://localhost:5173',
       reuseExistingServer: !process.env.CI,
       cwd: '..',
+      timeout: 30000,
     },
   ],
 });

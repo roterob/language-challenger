@@ -23,19 +23,27 @@ interface MeteorResource {
   _id: string;
   code?: string;
   type: string;
-  contentEs: string;
-  contentEn: string;
+  content?: {
+    es?: string;
+    en?: string;
+    esAudio?: string;
+    enAudio?: string;
+  };
+  // Soporte para campos planos en algunos exports
+  contentEs?: string;
+  contentEn?: string;
+  contentEsAudio?: string;
+  contentEnAudio?: string;
   tags?: string[];
-  audioId?: string;
-  favourite?: boolean;
   createdAt?: { $date: string } | string;
   updatedAt?: { $date: string } | string;
 }
 
 interface MeteorList {
   _id: string;
-  code?: string;
-  title: string;
+  name?: string;
+  title?: string; // alias legacy
+  tags?: string[];
   resources?: string[];
   createdAt?: { $date: string } | string;
 }
@@ -133,12 +141,12 @@ function migrateResources(filePath: string) {
       .insert(resources)
       .values({
         code: mr.code || `MIG-${mr._id.slice(0, 8)}`,
-        type: mr.type || 'phrase',
-        contentEs: mr.contentEs || '',
-        contentEn: mr.contentEn || '',
-        tags: mr.tags ? JSON.stringify(mr.tags) : '[]',
-        audioId: mr.audioId || null,
-        favourite: mr.favourite ?? false,
+        type: (mr.type as 'phrase' | 'vocabulary' | 'paragraph') || 'phrase',
+        contentEs: mr.content?.es || mr.contentEs || '',
+        contentEn: mr.content?.en || mr.contentEn || '',
+        contentEsAudio: mr.content?.esAudio || mr.contentEsAudio || null,
+        contentEnAudio: mr.content?.enAudio || mr.contentEnAudio || null,
+        tags: JSON.stringify(mr.tags || []),
         createdAt: parseDate(mr.createdAt).toISOString(),
         updatedAt: parseDate(mr.updatedAt).toISOString(),
       })
@@ -163,26 +171,28 @@ function migrateLists(filePath: string, resourceIdMap: Map<string, string>) {
 
   let created = 0;
   let skipped = 0;
+  let totalLinks = 0;
 
   for (const ml of meteorLists) {
-    if (ml.code) {
-      const existing = db.select().from(lists).where(eq(lists.code, ml.code)).get();
-      if (existing) {
-        skipped++;
-        continue;
-      }
+    const listName = ml.name || ml.title || 'Untitled';
+
+    // Deduplicar por nombre exacto
+    const existing = db.select().from(lists).where(eq(lists.name, listName)).get();
+    if (existing) {
+      skipped++;
+      continue;
     }
 
     const [inserted] = db
       .insert(lists)
       .values({
-        code: ml.code || `LMG-${ml._id.slice(0, 8)}`,
-        title: ml.title || 'Untitled',
+        name: listName,
+        tags: JSON.stringify(ml.tags || []),
         createdAt: parseDate(ml.createdAt).toISOString(),
       })
       .returning();
 
-    // Link resources
+    // Vincular recursos
     const resourceIds = (ml.resources || [])
       .map((mid) => resourceIdMap.get(mid))
       .filter(Boolean) as string[];
@@ -192,17 +202,16 @@ function migrateLists(filePath: string, resourceIdMap: Map<string, string>) {
         .values({
           listId: inserted.id,
           resourceId: resourceIds[i],
-          order: i,
+          position: i,
         })
         .run();
     }
 
+    totalLinks += resourceIds.length;
     created++;
   }
 
-  console.log(
-    `    ✅ Lists: ${created} created, ${skipped} skipped (${meteorLists.reduce((a, l) => a + (l.resources?.length || 0), 0)} resource links)`,
-  );
+  console.log(`    ✅ Lists: ${created} created, ${skipped} skipped (${totalLinks} resource links)`);
 }
 
 async function main() {

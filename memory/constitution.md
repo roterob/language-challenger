@@ -498,6 +498,7 @@ api.get<T>(url) / api.post<T>(url, body) / api.put<T>() / api.patch<T>() / api.d
 ```
 
 Definido en `client/src/lib/api.ts`. Gestiona automáticamente:
+
 - Token JWT en header `Authorization: Bearer`
 - Redirect a `/login` en respuestas 401
 - Soporte para `FormData` (upload de archivos)
@@ -506,6 +507,7 @@ Definido en `client/src/lib/api.ts`. Gestiona automáticamente:
 ### 7.2 TanStack Query Hooks — Data fetching
 
 Hooks personalizados en `client/src/hooks/`:
+
 - `useResources()`, `useResource(id)`, `useSaveResource()`, `useToggleFavourite()`
 - `useLists()`, `useSaveList()`
 - `useExecutions()`, `useExecution(id)`, `useStartExecution()`, etc.
@@ -516,6 +518,7 @@ Cada hook encapsula `useQuery` o `useMutation` con cache keys y `queryClient.inv
 ### 7.3 AuthContext — Autenticación con React Context
 
 `AuthProvider` en `client/src/contexts/auth-context.tsx`:
+
 - Almacena token JWT en `localStorage`
 - Expone `user`, `login()`, `logout()`, `updateUser()`
 - Carga perfil del usuario al montar con `GET /api/auth/me`
@@ -524,6 +527,7 @@ Cada hook encapsula `useQuery` o `useMutation` con cache keys y `queryClient.inv
 ### 7.4 Validación compartida con Zod
 
 Los esquemas Zod viven en `packages/shared/src/schemas/` y se usan tanto en:
+
 - **Server**: validación de request body en cada ruta Hono (`schema.safeParse(body)`)
 - **Client**: validación de formularios con `@hookform/resolvers/zod`
 
@@ -535,6 +539,7 @@ Los esquemas Zod viven en `packages/shared/src/schemas/` y se usan tanto en:
 ### 7.6 Drizzle ORM — Queries type-safe
 
 Las queries se realizan con la API funcional de Drizzle:
+
 - `db.select().from(table).where(eq(col, val))`
 - `db.insert(table).values({...}).returning()`
 - `db.update(table).set({...}).where(...)`
@@ -549,76 +554,76 @@ Todas las rutas bajo `/api/`. Autenticación via JWT Bearer token excepto donde 
 
 ### Auth (`/api/auth`)
 
-| Método | Ruta                | Auth | Descripción                        |
-| ------ | ------------------- | ---- | ---------------------------------- |
-| POST   | `/auth/login`       | ❌   | Login con username/password → JWT  |
-| GET    | `/auth/me`          | ✅   | Perfil del usuario actual          |
-| PATCH  | `/auth/me/settings` | ✅   | Actualizar uiSettings              |
-| GET    | `/auth/me/stats`    | ✅   | Estadísticas del usuario (UserStats)|
+| Método | Ruta                | Auth | Descripción                          |
+| ------ | ------------------- | ---- | ------------------------------------ |
+| POST   | `/auth/login`       | ❌   | Login con username/password → JWT    |
+| GET    | `/auth/me`          | ✅   | Perfil del usuario actual            |
+| PATCH  | `/auth/me/settings` | ✅   | Actualizar uiSettings                |
+| GET    | `/auth/me/stats`    | ✅   | Estadísticas del usuario (UserStats) |
 
 ### Resources (`/api/resources`)
 
-| Método | Ruta                            | Auth | Descripción                        |
-| ------ | ------------------------------- | ---- | ---------------------------------- |
-| GET    | `/resources`                    | ✅   | Listar recursos (paginado + filtros)|
-| GET    | `/resources/stats`              | ✅   | Stats por recurso del usuario      |
-| GET    | `/resources/:id`                | ✅   | Detalle de un recurso              |
-| POST   | `/resources`                    | ✅   | Crear recurso                      |
-| PUT    | `/resources/:id`                | ✅   | Editar recurso                     |
-| PATCH  | `/resources/:id/favourite`      | ✅   | Toggle favorito                    |
+| Método | Ruta                       | Auth | Descripción                          |
+| ------ | -------------------------- | ---- | ------------------------------------ |
+| GET    | `/resources`               | ✅   | Listar recursos (paginado + filtros) |
+| GET    | `/resources/stats`         | ✅   | Stats por recurso del usuario        |
+| GET    | `/resources/:id`           | ✅   | Detalle de un recurso                |
+| POST   | `/resources`               | ✅   | Crear recurso                        |
+| PUT    | `/resources/:id`           | ✅   | Editar recurso                       |
+| PATCH  | `/resources/:id/favourite` | ✅   | Toggle favorito                      |
 
 ### Lists (`/api/lists`)
 
-| Método | Ruta                      | Auth | Descripción                          |
-| ------ | ------------------------- | ---- | ------------------------------------ |
-| GET    | `/lists`                  | ✅   | Listar listas (con stats del usuario)|
-| GET    | `/lists/:id`              | ✅   | Detalle de una lista                 |
-| GET    | `/lists/:id/resources`    | ✅   | Recursos de una lista                |
-| POST   | `/lists`                  | ✅   | Crear lista                          |
-| PUT    | `/lists/:id`              | ✅   | Editar lista                         |
+| Método | Ruta                   | Auth | Descripción                           |
+| ------ | ---------------------- | ---- | ------------------------------------- |
+| GET    | `/lists`               | ✅   | Listar listas (con stats del usuario) |
+| GET    | `/lists/:id`           | ✅   | Detalle de una lista                  |
+| GET    | `/lists/:id/resources` | ✅   | Recursos de una lista                 |
+| POST   | `/lists`               | ✅   | Crear lista                           |
+| PUT    | `/lists/:id`           | ✅   | Editar lista                          |
 
 ### Executions (`/api/executions`)
 
-| Método | Ruta                               | Auth | Descripción                          |
-| ------ | ---------------------------------- | ---- | ------------------------------------ |
-| GET    | `/executions`                      | ✅   | Listar ejecuciones del usuario       |
-| GET    | `/executions/:id`                  | ✅   | Detalle de ejecución con results     |
-| POST   | `/executions/start`                | ✅   | Iniciar ejecución de listas          |
-| POST   | `/executions/start-temporary`      | ✅   | Crear ejecución temporal sin lista   |
-| PATCH  | `/executions/:id/config`           | ✅   | Guardar configuración                |
-| PATCH  | `/executions/:id/result`           | ✅   | Guardar resultado de un recurso      |
-| PATCH  | `/executions/:id/restart`          | ✅   | Reiniciar ejecución (incrementa loops)|
-| PATCH  | `/executions/:id/finish`           | ✅   | Finalizar ejecución + actualizar stats|
+| Método | Ruta                          | Auth | Descripción                            |
+| ------ | ----------------------------- | ---- | -------------------------------------- |
+| GET    | `/executions`                 | ✅   | Listar ejecuciones del usuario         |
+| GET    | `/executions/:id`             | ✅   | Detalle de ejecución con results       |
+| POST   | `/executions/start`           | ✅   | Iniciar ejecución de listas            |
+| POST   | `/executions/start-temporary` | ✅   | Crear ejecución temporal sin lista     |
+| PATCH  | `/executions/:id/config`      | ✅   | Guardar configuración                  |
+| PATCH  | `/executions/:id/result`      | ✅   | Guardar resultado de un recurso        |
+| PATCH  | `/executions/:id/restart`     | ✅   | Reiniciar ejecución (incrementa loops) |
+| PATCH  | `/executions/:id/finish`      | ✅   | Finalizar ejecución + actualizar stats |
 
 ### Imports (`/api/imports`)
 
-| Método | Ruta                      | Auth | Descripción                      |
-| ------ | ------------------------- | ---- | -------------------------------- |
-| POST   | `/imports/upload`         | ✅   | Upload JSON + iniciar importación|
-| GET    | `/imports/tasks`          | ✅   | Listar todas las tareas          |
-| GET    | `/imports/tasks/active`   | ✅   | Tareas en progreso               |
-| GET    | `/imports/tasks/:id`      | ✅   | Detalle de una tarea             |
+| Método | Ruta                    | Auth | Descripción                       |
+| ------ | ----------------------- | ---- | --------------------------------- |
+| POST   | `/imports/upload`       | ✅   | Upload JSON + iniciar importación |
+| GET    | `/imports/tasks`        | ✅   | Listar todas las tareas           |
+| GET    | `/imports/tasks/active` | ✅   | Tareas en progreso                |
+| GET    | `/imports/tasks/:id`    | ✅   | Detalle de una tarea              |
 
 ### Health
 
-| Método | Ruta           | Auth | Descripción       |
-| ------ | -------------- | ---- | ----------------- |
-| GET    | `/health`      | ❌   | Health check      |
+| Método | Ruta      | Auth | Descripción  |
+| ------ | --------- | ---- | ------------ |
+| GET    | `/health` | ❌   | Health check |
 
 ---
 
 ## 9. Hooks de Data Fetching (reemplazo de Publications)
 
-| Hook                    | Módulo     | Equivale a (Meteor)       | Descripción                                       |
-| ----------------------- | ---------- | ------------------------- | ------------------------------------------------- |
-| `useResources(params)`  | Resources  | `pub: resources`          | Recursos paginados con filtros                    |
-| `useResourceStats()`    | Resources  | `pub: resourcesStats`     | Stats por recurso del usuario via `/resources/stats`|
-| `useLists(params)`      | Lists      | `pub: lists`              | Listas con stats del usuario                      |
-| `useExecutions(params)` | Executions | `pub: executions`         | Ejecuciones del usuario con filtros               |
-| `useExecution(id)`      | Executions | `pub: execution`          | Ejecución específica con results + resources      |
-| `useActiveImportTasks()`| Imports    | `pub: activeTasks`        | Tareas en progreso (polling 2s)                   |
-| `useImportTasks()`      | Imports    | `pub: task`               | Historial de todas las tareas                     |
-| `useAuth().user`        | Users      | `pub: currentUser`        | Usuario actual via AuthContext                    |
+| Hook                     | Módulo     | Equivale a (Meteor)   | Descripción                                          |
+| ------------------------ | ---------- | --------------------- | ---------------------------------------------------- |
+| `useResources(params)`   | Resources  | `pub: resources`      | Recursos paginados con filtros                       |
+| `useResourceStats()`     | Resources  | `pub: resourcesStats` | Stats por recurso del usuario via `/resources/stats` |
+| `useLists(params)`       | Lists      | `pub: lists`          | Listas con stats del usuario                         |
+| `useExecutions(params)`  | Executions | `pub: executions`     | Ejecuciones del usuario con filtros                  |
+| `useExecution(id)`       | Executions | `pub: execution`      | Ejecución específica con results + resources         |
+| `useActiveImportTasks()` | Imports    | `pub: activeTasks`    | Tareas en progreso (polling 2s)                      |
+| `useImportTasks()`       | Imports    | `pub: task`           | Historial de todas las tareas                        |
+| `useAuth().user`         | Users      | `pub: currentUser`    | Usuario actual via AuthContext                       |
 
 ---
 
@@ -627,6 +632,7 @@ Todas las rutas bajo `/api/`. Autenticación via JWT Bearer token excepto donde 
 ### Seed (`server/src/db/seed.ts`)
 
 Ejecutable con `pnpm seed`. Crea:
+
 - **Usuarios por defecto:**
   - Admin: `admin` / `secret` (isAdmin: true)
   - Guest: `guest` / `secret` (isGuest: true)
@@ -636,6 +642,7 @@ Ejecutable con `pnpm seed`. Crea:
 ### Migración desde Meteor (`server/src/db/migrate-meteor.ts`)
 
 Script para importar datos existentes de MongoDB (exports JSON). Ejecutable con `pnpm migrate:meteor`.
+
 - Importa usuarios preservando hashes bcrypt de Meteor
 - Importa recursos con deduplicación por `code`
 - Importa listas con mapeo de IDs Meteor → SQLite UUIDs
@@ -648,21 +655,23 @@ Gestionadas con `drizzle-kit`. Archivo SQL en `server/drizzle/0000_orange_star_b
 
 ## 11. Módulos Utilitarios (`packages/shared`)
 
-| Módulo                     | Ubicación                   | Descripción                                    |
-| -------------------------- | --------------------------- | ---------------------------------------------- |
-| `get-audio-link`           | `shared/utils/`             | Genera URL de descarga de Google Drive          |
-| `type-colors`              | `shared/utils/`             | Colores por tipo: phrase=#61bd4f, vocabulary=#f2d600, paragraph=#ff9f1a |
-| `date-helpers`             | `shared/utils/`             | `parseDate()` + `formatRelativeTime()`         |
-| `build-filters`            | `shared/utils/`             | Parser de tags de búsqueda con filtros especiales |
-| Schemas (user, resource, list, execution) | `shared/schemas/` | Validación Zod compartida client+server        |
-| Types (user, resource, list, execution, import) | `shared/types/` | Interfaces TypeScript                          |
+| Módulo                                          | Ubicación         | Descripción                                                             |
+| ----------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
+| `get-audio-link`                                | `shared/utils/`   | Genera URL de descarga de Google Drive                                  |
+| `type-colors`                                   | `shared/utils/`   | Colores por tipo: phrase=#61bd4f, vocabulary=#f2d600, paragraph=#ff9f1a |
+| `date-helpers`                                  | `shared/utils/`   | `parseDate()` + `formatRelativeTime()`                                  |
+| `build-filters`                                 | `shared/utils/`   | Parser de tags de búsqueda con filtros especiales                       |
+| Schemas (user, resource, list, execution)       | `shared/schemas/` | Validación Zod compartida client+server                                 |
+| Types (user, resource, list, execution, import) | `shared/types/`   | Interfaces TypeScript                                                   |
 
 ### Utilidad `cn()` (cliente)
 
 ```ts
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-export function cn(...inputs) { return twMerge(clsx(inputs)); }
+export function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
 ```
 
 Patrón estándar de shadcn/ui para combinar clases Tailwind de forma segura.
@@ -671,15 +680,15 @@ Patrón estándar de shadcn/ui para combinar clases Tailwind de forma segura.
 
 ## 12. Scripts del Proyecto
 
-| Script             | Comando                   | Descripción                                      |
-| ------------------ | ------------------------- | ------------------------------------------------ |
-| `pnpm dev`         | `concurrently` server+client | Arranca server (3001) y client (5173) en paralelo|
-| `pnpm dev:server`  | `tsx watch src/index.ts`  | Server con hot-reload                            |
-| `pnpm dev:client`  | `vite`                    | Cliente con HMR                                  |
-| `pnpm build`       | Build server + client     | Producción                                       |
-| `pnpm seed`        | `tsx src/db/seed.ts`      | Poblar DB con datos de ejemplo                   |
-| `pnpm migrate:meteor` | `tsx src/db/migrate-meteor.ts` | Migrar datos de Meteor/MongoDB              |
-| `pnpm typecheck`   | `tsc --noEmit` en todos   | Verificación de tipos                            |
+| Script                | Comando                        | Descripción                                       |
+| --------------------- | ------------------------------ | ------------------------------------------------- |
+| `pnpm dev`            | `concurrently` server+client   | Arranca server (3001) y client (5173) en paralelo |
+| `pnpm dev:server`     | `tsx watch src/index.ts`       | Server con hot-reload                             |
+| `pnpm dev:client`     | `vite`                         | Cliente con HMR                                   |
+| `pnpm build`          | Build server + client          | Producción                                        |
+| `pnpm seed`           | `tsx src/db/seed.ts`           | Poblar DB con datos de ejemplo                    |
+| `pnpm migrate:meteor` | `tsx src/db/migrate-meteor.ts` | Migrar datos de Meteor/MongoDB                    |
+| `pnpm typecheck`      | `tsc --noEmit` en todos        | Verificación de tipos                             |
 
 ---
 
@@ -689,15 +698,15 @@ Patrón estándar de shadcn/ui para combinar clases Tailwind de forma segura.
 
 Configuración en `e2e/playwright.config.ts`. Tests en `e2e/app.spec.ts`.
 
-| Test                     | Descripción                                    |
-| ------------------------ | ---------------------------------------------- |
-| Redirect to login        | Verifica que `/` redirige a `/login` sin auth  |
-| Show login page          | Verifica el formulario de login                |
-| Invalid credentials      | Verifica error con credenciales incorrectas    |
-| Admin login              | Login con admin/secret exitoso                 |
-| Display resources        | Verifica que la tabla de recursos se muestra   |
-| Navigate to lists/exec   | Navegación por las rutas principales           |
-| Logout                   | Verifica que el logout funciona                |
+| Test                   | Descripción                                   |
+| ---------------------- | --------------------------------------------- |
+| Redirect to login      | Verifica que `/` redirige a `/login` sin auth |
+| Show login page        | Verifica el formulario de login               |
+| Invalid credentials    | Verifica error con credenciales incorrectas   |
+| Admin login            | Login con admin/secret exitoso                |
+| Display resources      | Verifica que la tabla de recursos se muestra  |
+| Navigate to lists/exec | Navegación por las rutas principales          |
+| Logout                 | Verifica que el logout funciona               |
 
 El config arranca ambos servidores automáticamente (`webServer`).
 
@@ -717,4 +726,3 @@ El config arranca ambos servidores automáticamente (`webServer`).
 10. ✅ **ostrio:files → Hono parseBody()**: Upload nativo sin dependencias Meteor.
 11. ✅ **`_.shuffle` global → Fisher-Yates** en servicio de ejecuciones.
 12. ✅ **Code splitting**: React.lazy + Vite manualChunks (bundle principal 162KB).
-

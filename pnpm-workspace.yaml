@@ -2,4 +2,5 @@ packages:
   - client
   - server
   - packages/*
+  - e2e
 onlyBuiltDependencies: '["esbuild","better-sqlite3"]'

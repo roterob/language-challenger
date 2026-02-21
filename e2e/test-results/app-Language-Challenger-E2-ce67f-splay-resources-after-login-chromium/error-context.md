@@ -1,0 +1,70 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - button [ref=e6] [cursor=pointer]:
+          - img [ref=e7]
+        - generic [ref=e8]:
+          - img [ref=e9]
+          - generic [ref=e13]: Language Challenger
+        - button "AD admin" [ref=e15] [cursor=pointer]:
+          - generic [ref=e17]: AD
+          - generic [ref=e18]: admin
+    - complementary [ref=e19]:
+      - navigation [ref=e20]:
+        - link "Recursos" [ref=e21] [cursor=pointer]:
+          - /url: /resources
+          - img [ref=e22]
+          - generic [ref=e24]: Recursos
+        - link "Listas" [ref=e25] [cursor=pointer]:
+          - /url: /lists
+          - img [ref=e26]
+          - generic [ref=e29]: Listas
+        - link "Ejecuciones" [ref=e30] [cursor=pointer]:
+          - /url: /executions
+          - img [ref=e31]
+          - generic [ref=e34]: Ejecuciones
+        - link "Importar" [ref=e35] [cursor=pointer]:
+          - /url: /imports
+          - img [ref=e36]
+          - generic [ref=e39]: Importar
+    - main [ref=e40]:
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - heading "Recursos" [level=1] [ref=e43]
+          - button "Nuevo recurso" [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+            - text: Nuevo recurso
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - img [ref=e48]
+            - textbox "Buscar por contenido o código…" [ref=e51]
+          - combobox [ref=e52] [cursor=pointer]:
+            - generic: Todos los tipos
+            - img [ref=e53]
+        - table [ref=e56]:
+          - rowgroup [ref=e57]:
+            - row "Código Tipo Español Inglés Tags Audio Acciones" [ref=e58]:
+              - columnheader "Código" [ref=e59]
+              - columnheader "Tipo" [ref=e60]
+              - columnheader "Español" [ref=e61]
+              - columnheader "Inglés" [ref=e62]
+              - columnheader "Tags" [ref=e63]
+              - columnheader "Audio" [ref=e64]
+              - columnheader "Acciones" [ref=e65]
+          - rowgroup [ref=e66]:
+            - row "No hay recursos" [ref=e67]:
+              - cell "No hay recursos" [ref=e68]
+        - generic [ref=e69]:
+          - generic [ref=e70]: 40 recursos — Página 1 de 2
+          - generic [ref=e71]:
+            - button [disabled]:
+              - img
+            - button [ref=e72] [cursor=pointer]:
+              - img [ref=e73]
+    - contentinfo [ref=e76]: Language Challenger © 2026 — Aprende inglés con las cartillas Vaughan
+  - region "Notifications alt+T"
+```
