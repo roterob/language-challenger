@@ -50,7 +50,7 @@ export function ListsPage() {
 
   const handleStart = async (listId: string) => {
     try {
-      const res = await startExecution.mutateAsync({ listId });
+      const res = await startExecution.mutateAsync({ listIds: [listId] });
       setExecutionId((res as any).execution.id);
       setExecutionOpen(true);
     } catch (e: any) {
@@ -91,37 +91,50 @@ export function ListsPage() {
           lists.map((l) => (
             <div
               key={l.id}
-              className="rounded-lg border bg-card p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="rounded-lg border bg-card p-4 hover:shadow-md transition-shadow cursor-pointer flex flex-col gap-3"
               onClick={() => handleEdit(l)}
             >
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold truncate">{l.title}</h3>
-                <Badge variant="secondary" className="ml-2 shrink-0">
-                  {l.resourceCount ?? 0} recursos
+              {/* Header: nombre + contador */}
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="font-semibold leading-tight">{l.name}</h3>
+                <Badge variant="secondary" className="shrink-0">
+                  {l.resources?.length ?? 0} recursos
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground mb-3 font-mono">{l.code}</p>
 
+              {/* Tags */}
+              {l.tags && l.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {l.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs px-2 py-0">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Stats */}
               {l.stats && (
-                <div className="grid grid-cols-3 gap-2 text-center text-xs mb-3">
-                  <div className="rounded bg-green-50 p-1">
-                    <div className="font-bold text-green-600">{l.stats.ok ?? 0}</div>
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="rounded bg-green-50 dark:bg-green-950 p-1">
+                    <div className="font-bold text-green-600">{l.stats.correct ?? 0}</div>
                     <div className="text-muted-foreground">OK</div>
                   </div>
-                  <div className="rounded bg-red-50 p-1">
-                    <div className="font-bold text-red-600">{l.stats.fail ?? 0}</div>
+                  <div className="rounded bg-red-50 dark:bg-red-950 p-1">
+                    <div className="font-bold text-red-600">{l.stats.incorrect ?? 0}</div>
                     <div className="text-muted-foreground">Fail</div>
                   </div>
-                  <div className="rounded bg-blue-50 p-1">
-                    <div className="font-bold text-blue-600">{l.stats.total ?? 0}</div>
-                    <div className="text-muted-foreground">Total</div>
+                  <div className="rounded bg-blue-50 dark:bg-blue-950 p-1">
+                    <div className="font-bold text-blue-600">{l.stats.executions ?? 0}</div>
+                    <div className="text-muted-foreground">Ejecuciones</div>
                   </div>
                 </div>
               )}
 
+              {/* Botón practicar */}
               <Button
                 size="sm"
-                className="w-full"
+                className="w-full mt-auto"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleStart(l.id);

@@ -45,7 +45,7 @@ export function useExecution(id: string | undefined) {
 export function useStartExecution() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: { listId: string }) =>
+    mutationFn: (data: { listIds: string[] }) =>
       api.post<{ execution: Execution }>('/executions/start', data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['executions'] });
