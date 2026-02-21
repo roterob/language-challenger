@@ -3,6 +3,19 @@ import { resources, resourceStats } from '../db/schema';
 import { eq, like, and, inArray, sql, desc, asc } from 'drizzle-orm';
 import type { SaveResourceInput } from '@language-challenger/shared';
 
+// Drizzle devuelve JSON columns como string cuando fueron insertados con JSON.stringify
+function parseTags(tags: unknown): string[] {
+  if (Array.isArray(tags)) return tags;
+  if (typeof tags === 'string') {
+    try {
+      return JSON.parse(tags);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 export const resourcesService = {
   getResources(filters: {
     tags?: string[];
@@ -47,9 +60,9 @@ export const resourcesService = {
       .get();
 
     return {
-      items: items.map((r) => ({
+      resources: items.map((r) => ({
         ...r,
-        tags: r.tags ?? [],
+        tags: parseTags(r.tags),
       })),
       total: countResult?.count ?? 0,
     };
@@ -60,7 +73,7 @@ export const resourcesService = {
     if (!resource) {
       throw Object.assign(new Error('Resource not found'), { status: 404 });
     }
-    return { ...resource, tags: resource.tags ?? [] };
+    return { ...resource, tags: parseTags(resource.tags) };
   },
 
   saveResource(id: string | undefined, data: SaveResourceInput) {
@@ -97,7 +110,7 @@ export const resourcesService = {
         .returning()
         .get();
 
-      return { ...result, tags: result.tags ?? [] };
+      return { ...result, tags: parseTags(result.tags) };
     }
   },
 
@@ -227,7 +240,7 @@ export const resourcesService = {
       .get();
 
     return {
-      items,
+      stats: items,
       total: countResult?.count ?? 0,
     };
   },

@@ -3,6 +3,18 @@ import { lists, listResources, listStats, resources } from '../db/schema';
 import { eq, and, sql, desc } from 'drizzle-orm';
 import type { SaveListInput } from '@language-challenger/shared';
 
+function parseTags(tags: unknown): string[] {
+  if (Array.isArray(tags)) return tags;
+  if (typeof tags === 'string') {
+    try {
+      return JSON.parse(tags);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 export const listsService = {
   getLists(
     userId: string,
@@ -60,14 +72,14 @@ export const listsService = {
 
       return {
         ...list,
-        tags: list.tags ?? [],
+        tags: parseTags(list.tags),
         resources: resourceIds,
         stats: stats ?? null,
       };
     });
 
     return {
-      items: enrichedItems,
+      lists: enrichedItems,
       total: countResult?.count ?? 0,
     };
   },
@@ -88,7 +100,7 @@ export const listsService = {
 
     return {
       ...list,
-      tags: list.tags ?? [],
+      tags: parseTags(list.tags),
       resources: resourceIds,
     };
   },

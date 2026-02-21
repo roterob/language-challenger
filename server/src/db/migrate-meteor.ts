@@ -142,7 +142,7 @@ function migrateResources(filePath: string) {
         contentEn: mr.info?.en?.text || '',
         contentEsAudio: mr.info?.es?.audio || null,
         contentEnAudio: mr.info?.en?.audio || null,
-        tags: JSON.stringify(mr.tags || []),
+        tags: mr.tags || [],
         createdAt: parseDate(mr.createdAt).toISOString(),
         updatedAt: parseDate(mr.updatedAt).toISOString(),
       })
@@ -184,7 +184,7 @@ function migrateLists(filePath: string, resourceIdMap: Map<string, string>) {
       .insert(lists)
       .values({
         name: listName,
-        tags: JSON.stringify(ml.tags || []),
+        tags: ml.tags || [],
         createdAt: parseDate(ml.createdAt).toISOString(),
       })
       .returning()

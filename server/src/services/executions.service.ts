@@ -82,7 +82,7 @@ export const executionsService = {
     });
 
     return {
-      items: enrichedItems,
+      executions: enrichedItems,
       total: countResult?.count ?? 0,
     };
   },
