@@ -87,7 +87,7 @@ async function migrateUsers(filePath: string) {
     // Use Meteor bcrypt hash directly or create a default password
     const passwordHash = mu.services?.password?.bcrypt || (await bcrypt.hash('changeme', 10));
 
-    const [inserted] = db
+    const inserted = db
       .insert(users)
       .values({
         username: mu.username,
@@ -98,7 +98,8 @@ async function migrateUsers(filePath: string) {
         isGuest: mu.profile?.isGuest ?? false,
         uiSettings: mu.profile?.uiSettings ? JSON.stringify(mu.profile.uiSettings) : '{}',
       })
-      .returning();
+      .returning()
+      .get();
 
     idMap.set(mu._id, inserted.id);
     console.log(`    ✅ User "${mu.username}" migrated`);
@@ -132,7 +133,7 @@ function migrateResources(filePath: string) {
       }
     }
 
-    const [inserted] = db
+    const inserted = db
       .insert(resources)
       .values({
         code: mr.resourceCode || mr.code || `MIG-${mr._id.slice(0, 8)}`,
@@ -145,7 +146,8 @@ function migrateResources(filePath: string) {
         createdAt: parseDate(mr.createdAt).toISOString(),
         updatedAt: parseDate(mr.updatedAt).toISOString(),
       })
-      .returning();
+      .returning()
+      .get();
 
     idMap.set(mr._id, inserted.id);
     created++;
@@ -178,14 +180,15 @@ function migrateLists(filePath: string, resourceIdMap: Map<string, string>) {
       continue;
     }
 
-    const [inserted] = db
+    const inserted = db
       .insert(lists)
       .values({
         name: listName,
         tags: JSON.stringify(ml.tags || []),
         createdAt: parseDate(ml.createdAt).toISOString(),
       })
-      .returning();
+      .returning()
+      .get();
 
     // Vincular recursos
     const resourceIds = (ml.resources || [])
