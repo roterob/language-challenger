@@ -30,9 +30,7 @@ function ActiveTasks() {
             {task.progress !== undefined && task.progress !== null && (
               <Progress value={task.progress} className="h-2" />
             )}
-            {task.message && (
-              <p className="text-xs text-muted-foreground mt-1">{task.message}</p>
-            )}
+            {task.message && <p className="text-xs text-muted-foreground mt-1">{task.message}</p>}
           </CardContent>
         </Card>
       ))}

@@ -102,7 +102,10 @@ function ExecutionsTab() {
       <div className="flex gap-3">
         <Select
           value={stateFilter}
-          onValueChange={(v) => { setStateFilter(v === 'all' ? '' : v); setPage(1); }}
+          onValueChange={(v) => {
+            setStateFilter(v === 'all' ? '' : v);
+            setPage(1);
+          }}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Todos los estados" />
@@ -130,7 +133,9 @@ function ExecutionsTab() {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="text-center p-8 text-muted-foreground">Cargando…</td>
+                <td colSpan={6} className="text-center p-8 text-muted-foreground">
+                  Cargando…
+                </td>
               </tr>
             ) : executions.length === 0 ? (
               <tr>
@@ -143,8 +148,14 @@ function ExecutionsTab() {
                 <tr key={ex.id} className="border-b hover:bg-muted/30">
                   <td className="p-3 font-medium">{ex.listTitle || 'Temporal'}</td>
                   <td className="p-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${stateColor[ex.state] || ''}`}>
-                      {ex.state === 'in-progress' ? 'En progreso' : ex.state === 'finished' ? 'Finalizada' : ex.state}
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${stateColor[ex.state] || ''}`}
+                    >
+                      {ex.state === 'in-progress'
+                        ? 'En progreso'
+                        : ex.state === 'finished'
+                          ? 'Finalizada'
+                          : ex.state}
                     </span>
                   </td>
                   <td className="p-3 text-center text-green-600 font-medium">
@@ -166,12 +177,24 @@ function ExecutionsTab() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>{total} ejecuciones — Página {page} de {totalPages}</span>
+          <span>
+            {total} ejecuciones — Página {page} de {totalPages}
+          </span>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -200,7 +223,10 @@ function ResourceStatsTab() {
         <Input
           placeholder="Buscar recurso…"
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="pl-9"
         />
       </div>
@@ -221,7 +247,9 @@ function ResourceStatsTab() {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={7} className="text-center p-8 text-muted-foreground">Cargando…</td>
+                <td colSpan={7} className="text-center p-8 text-muted-foreground">
+                  Cargando…
+                </td>
               </tr>
             ) : stats.length === 0 ? (
               <tr>
@@ -236,17 +264,21 @@ function ResourceStatsTab() {
                 return (
                   <tr key={s.resourceId || s.id} className="border-b hover:bg-muted/30">
                     <td className="p-3 font-mono text-xs">{s.resourceCode || s.code || '—'}</td>
-                    <td className="p-3">
-                      {s.resourceType && <TypeBadge type={s.resourceType} />}
+                    <td className="p-3">{s.resourceType && <TypeBadge type={s.resourceType} />}</td>
+                    <td className="p-3 max-w-[200px] truncate">
+                      {s.resourceContentEs || s.contentEs || '—'}
                     </td>
-                    <td className="p-3 max-w-[200px] truncate">{s.resourceContentEs || s.contentEs || '—'}</td>
                     <td className="p-3 text-center text-green-600 font-medium">{s.ok ?? 0}</td>
                     <td className="p-3 text-center text-red-600 font-medium">{s.fail ?? 0}</td>
                     <td className="p-3 text-center">{total}</td>
                     <td className="p-3 text-center">
                       <span
                         className={`font-medium ${
-                          ratio >= 70 ? 'text-green-600' : ratio >= 40 ? 'text-yellow-600' : 'text-red-600'
+                          ratio >= 70
+                            ? 'text-green-600'
+                            : ratio >= 40
+                              ? 'text-yellow-600'
+                              : 'text-red-600'
                         }`}
                       >
                         {total > 0 ? `${ratio}%` : '—'}
@@ -262,12 +294,24 @@ function ResourceStatsTab() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>{total} recursos — Página {page} de {totalPages}</span>
+          <span>
+            {total} recursos — Página {page} de {totalPages}
+          </span>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

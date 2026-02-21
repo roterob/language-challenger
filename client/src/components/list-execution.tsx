@@ -21,12 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { TypeBadge } from '@/components/type-badge';
 import { AudioPlayer } from '@/components/audio-player';
 import { getAudioLink } from '@language-challenger/shared';
@@ -77,12 +72,13 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
     }
   }, [open, execution?.id]);
 
-  const resources = execution?.results?.map((r) => ({
-    ...r.resource,
-    resultId: r.id,
-    answered: !!r.result,
-    result: r.result,
-  })) ?? [];
+  const resources =
+    execution?.results?.map((r) => ({
+      ...r.resource,
+      resultId: r.id,
+      answered: !!r.result,
+      result: r.result,
+    })) ?? [];
 
   const current = resources[currentIndex];
   const totalResources = resources.length;
@@ -181,21 +177,13 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                 <Label htmlFor="automatic" className="cursor-pointer">
                   Modo automático (muestra respuesta tras {autoSeconds}s)
                 </Label>
-                <Switch
-                  id="automatic"
-                  checked={automatic}
-                  onCheckedChange={setAutomatic}
-                />
+                <Switch id="automatic" checked={automatic} onCheckedChange={setAutomatic} />
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="shuffle" className="cursor-pointer">
                   Barajar recursos
                 </Label>
-                <Switch
-                  id="shuffle"
-                  checked={shuffle}
-                  onCheckedChange={setShuffle}
-                />
+                <Switch id="shuffle" checked={shuffle} onCheckedChange={setShuffle} />
               </div>
               <Button className="w-full" onClick={handleStart} disabled={saveConfig.isPending}>
                 <Play className="mr-2 h-4 w-4" />
@@ -224,16 +212,12 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
               <TypeBadge type={current.type} />
               <p className="text-xl font-semibold">{current.contentEs}</p>
 
-              {current.audioId && (
-                <AudioPlayer audioId={current.audioId} />
-              )}
+              {current.audioId && <AudioPlayer audioId={current.audioId} />}
 
               {showAnswer ? (
                 <div className="space-y-4">
                   <div className="rounded-lg bg-muted p-4">
-                    <p className="text-lg font-medium text-primary">
-                      {current.contentEn}
-                    </p>
+                    <p className="text-lg font-medium text-primary">{current.contentEn}</p>
                   </div>
                   <div className="flex gap-3 justify-center">
                     <Button
@@ -258,11 +242,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                   </div>
                 </div>
               ) : (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setShowAnswer(true)}
-                >
+                <Button variant="outline" size="lg" onClick={() => setShowAnswer(true)}>
                   Mostrar respuesta
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -291,9 +271,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                 </div>
                 <div className="rounded-lg bg-blue-50 p-4">
                   <div className="text-3xl font-bold text-blue-600">
-                    {totalResources > 0
-                      ? `${Math.round((okCount / totalResources) * 100)}%`
-                      : '—'}
+                    {totalResources > 0 ? `${Math.round((okCount / totalResources) * 100)}%` : '—'}
                   </div>
                   <div className="text-sm text-muted-foreground">Ratio</div>
                 </div>
