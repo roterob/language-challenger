@@ -21,19 +21,13 @@ import bcrypt from 'bcryptjs';
 
 interface MeteorResource {
   _id: string;
-  code?: string;
+  resourceCode?: string;
+  code?: string; // alias legacy
   type: string;
-  content?: {
-    es?: string;
-    en?: string;
-    esAudio?: string;
-    enAudio?: string;
+  info?: {
+    es?: { text?: string; audio?: string };
+    en?: { text?: string; audio?: string };
   };
-  // Soporte para campos planos en algunos exports
-  contentEs?: string;
-  contentEn?: string;
-  contentEsAudio?: string;
-  contentEnAudio?: string;
   tags?: string[];
   createdAt?: { $date: string } | string;
   updatedAt?: { $date: string } | string;
@@ -127,9 +121,10 @@ function migrateResources(filePath: string) {
   let skipped = 0;
 
   for (const mr of meteorResources) {
-    // Check if already exists by code
-    if (mr.code) {
-      const existing = db.select().from(resources).where(eq(resources.code, mr.code)).get();
+    // Check if already exists by resourceCode
+    const resourceCode = mr.resourceCode || mr.code;
+    if (resourceCode) {
+      const existing = db.select().from(resources).where(eq(resources.code, resourceCode)).get();
       if (existing) {
         idMap.set(mr._id, existing.id);
         skipped++;
@@ -140,12 +135,12 @@ function migrateResources(filePath: string) {
     const [inserted] = db
       .insert(resources)
       .values({
-        code: mr.code || `MIG-${mr._id.slice(0, 8)}`,
+        code: mr.resourceCode || mr.code || `MIG-${mr._id.slice(0, 8)}`,
         type: (mr.type as 'phrase' | 'vocabulary' | 'paragraph') || 'phrase',
-        contentEs: mr.content?.es || mr.contentEs || '',
-        contentEn: mr.content?.en || mr.contentEn || '',
-        contentEsAudio: mr.content?.esAudio || mr.contentEsAudio || null,
-        contentEnAudio: mr.content?.enAudio || mr.contentEnAudio || null,
+        contentEs: mr.info?.es?.text || '',
+        contentEn: mr.info?.en?.text || '',
+        contentEsAudio: mr.info?.es?.audio || null,
+        contentEnAudio: mr.info?.en?.audio || null,
         tags: JSON.stringify(mr.tags || []),
         createdAt: parseDate(mr.createdAt).toISOString(),
         updatedAt: parseDate(mr.updatedAt).toISOString(),
@@ -211,7 +206,9 @@ function migrateLists(filePath: string, resourceIdMap: Map<string, string>) {
     created++;
   }
 
-  console.log(`    ✅ Lists: ${created} created, ${skipped} skipped (${totalLinks} resource links)`);
+  console.log(
+    `    ✅ Lists: ${created} created, ${skipped} skipped (${totalLinks} resource links)`,
+  );
 }
 
 async function main() {
