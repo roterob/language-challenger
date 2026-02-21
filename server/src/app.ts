@@ -7,6 +7,7 @@ import { resourcesRoutes } from './routes/resources.routes';
 import { listsRoutes } from './routes/lists.routes';
 import { executionsRoutes } from './routes/executions.routes';
 import { importsRoutes } from './routes/imports.routes';
+import { audioRoutes } from './routes/audio.routes';
 
 const app = new Hono();
 
@@ -32,5 +33,6 @@ app.route('/api/resources', resourcesRoutes);
 app.route('/api/lists', listsRoutes);
 app.route('/api/executions', executionsRoutes);
 app.route('/api/imports', importsRoutes);
+app.route('/api/audio', audioRoutes);
 
 export { app };

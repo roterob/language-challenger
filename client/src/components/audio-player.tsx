@@ -36,6 +36,7 @@ export function AudioPlayer({ audioId, compact = false }: AudioPlayerProps) {
     <>
       <audio ref={audioRef} onEnded={handleEnded} />
       <Button
+        type="button"
         variant="ghost"
         size={compact ? 'icon' : 'sm'}
         onClick={toggle}

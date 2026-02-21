@@ -1,2 +1,1 @@
-export default resourceId =>
-  `https://docs.google.com/uc?id=${resourceId}&export=download`;
+export default (resourceId) => `/api/audio/${resourceId}`;
