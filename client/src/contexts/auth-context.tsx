@@ -21,8 +21,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = api.getToken();
     if (token) {
       api
-        .get<{ user: UserPublic }>('/auth/me')
-        .then((res) => setUser(res.user))
+        .get<UserPublic>('/auth/me')
+        .then((res) => setUser(res))
         .catch(() => {
           api.clearToken();
         })
