@@ -1,8 +1,41 @@
+# Dependencies
 node_modules/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Database
+server/data/*.db
+server/data/*.db-journal
+server/data/*.db-wal
+
+# Uploads
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+
+# Meteor (legacy - kept for reference)
+.meteor
+
+# Logs
+debug.log
+*.log
+
+# Settings (legacy)
 settings-dev.json
 settings-staging.json
 settings-production.json
 deploy-settings.json
-.vscode
-.meteor
-debug.log
+
+# OS
+.DS_Store
+Thumbs.db
