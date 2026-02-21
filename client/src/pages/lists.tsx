@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
-import { Plus, PlayCircle, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Plus, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLists, useListResources, useListTags } from '@/hooks/use-lists';
 import { useStartExecution } from '@/hooks/use-executions';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ListFormModal } from '@/components/list-form-modal';
 import { ListExecution } from '@/components/list-execution';
+import { SearchWithTags } from '@/components/search-with-tags';
 import type { ListWithStats } from '@language-challenger/shared';
 import { toast } from 'sonner';
 
@@ -77,40 +77,15 @@ export function ListsPage() {
         )}
       </div>
 
-      <div className="space-y-3">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar listas…"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            className="pl-9"
-          />
-        </div>
-        {availableTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm text-muted-foreground font-medium">Tags:</span>
-            {availableTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant={tagFilter.includes(tag) ? 'default' : 'outline'}
-                className="cursor-pointer select-none"
-                onClick={() => {
-                  setTagFilter((prev) =>
-                    prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-                  );
-                  setPage(1);
-                }}
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
+      <SearchWithTags
+        searchValue={search}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        activeTags={tagFilter}
+        onTagsChange={(tags) => { setTagFilter(tags); setPage(1); }}
+        availableTags={availableTags}
+        placeholder="Buscar listas o tag…"
+        className="max-w-sm"
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (

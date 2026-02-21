@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Plus, Trash2, Star, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth-context';
 import { useResources, useDeleteResource, useToggleFavourite, useResourceTags } from '@/hooks/use-resources';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -16,6 +14,7 @@ import {
 import { TypeBadge } from '@/components/type-badge';
 import { AudioPlayer } from '@/components/audio-player';
 import { ResourceFormModal } from '@/components/resource-form-modal';
+import { SearchWithTags } from '@/components/search-with-tags';
 import type { Resource } from '@language-challenger/shared';
 
 const PAGE_SIZE = 20;
@@ -82,19 +81,16 @@ export function ResourcesPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por contenido o código…"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            className="pl-9"
-          />
-        </div>
+      <div className="flex flex-wrap gap-3 items-start">
+        <SearchWithTags
+          searchValue={search}
+          onSearchChange={(v) => { setSearch(v); setPage(1); }}
+          activeTags={tagFilter}
+          onTagsChange={(tags) => { setTagFilter(tags); setPage(1); }}
+          availableTags={availableTags}
+          placeholder="Buscar por contenido, código o tag…"
+          className="flex-1 min-w-[240px]"
+        />
         <Select
           value={typeFilter}
           onValueChange={(v) => {
@@ -113,27 +109,6 @@ export function ResourcesPage() {
           </SelectContent>
         </Select>
       </div>
-      {availableTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm text-muted-foreground font-medium">Tags:</span>
-          {availableTags.map((tag) => (
-            <Badge
-              key={tag}
-              variant={tagFilter.includes(tag) ? 'default' : 'outline'}
-              className="cursor-pointer select-none"
-              onClick={() => {
-                setTagFilter((prev) =>
-                  prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-                );
-                setPage(1);
-              }}
-            >
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      )}
-
       {/* Tabla */}
       <div className="rounded-md border">
         <table className="w-full text-sm">
