@@ -38,7 +38,7 @@ export const resourcesService = {
 
     if (filters.tags && filters.tags.length > 0) {
       for (const tag of filters.tags) {
-        conditions.push(sql`${resources.tags} LIKE ${'%' + tag + '%'}`);
+        conditions.push(sql`${resources.tags} LIKE ${`%"${tag}"%`}`);
       }
     }
 
@@ -180,7 +180,7 @@ export const resourcesService = {
 
     if (filters.tags && filters.tags.length > 0) {
       for (const tag of filters.tags) {
-        conditions.push(sql`${resources.tags} LIKE ${'%' + tag + '%'}`);
+        conditions.push(sql`${resources.tags} LIKE ${`%"${tag}"%`}`);
       }
     }
 

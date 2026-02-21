@@ -33,7 +33,7 @@ export const executionsService = {
 
     if (filters.tags && filters.tags.length > 0) {
       for (const tag of filters.tags) {
-        conditions.push(sql`${executions.tags} LIKE ${'%' + tag + '%'}`);
+        conditions.push(sql`${executions.tags} LIKE ${`%"${tag}"%`}`);
       }
     }
 
