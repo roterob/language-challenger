@@ -143,12 +143,7 @@ export const importsService = {
   },
 
   getTasks(limit = 50) {
-    return db
-      .select()
-      .from(importTasks)
-      .orderBy(desc(importTasks.createdAt))
-      .limit(limit)
-      .all();
+    return db.select().from(importTasks).orderBy(desc(importTasks.createdAt)).limit(limit).all();
   },
 
   getTaskById(taskId: string) {

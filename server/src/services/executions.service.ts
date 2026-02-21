@@ -254,7 +254,13 @@ export const executionsService = {
     const exec = db
       .select()
       .from(executions)
-      .where(and(eq(executions.id, executionId), eq(executions.userId, userId), eq(executions.inProgress, true)))
+      .where(
+        and(
+          eq(executions.id, executionId),
+          eq(executions.userId, userId),
+          eq(executions.inProgress, true),
+        ),
+      )
       .get();
 
     if (!exec) {
@@ -296,7 +302,13 @@ export const executionsService = {
     const exec = db
       .select()
       .from(executions)
-      .where(and(eq(executions.id, executionId), eq(executions.userId, userId), eq(executions.inProgress, true)))
+      .where(
+        and(
+          eq(executions.id, executionId),
+          eq(executions.userId, userId),
+          eq(executions.inProgress, true),
+        ),
+      )
       .get();
 
     if (!exec) {
@@ -343,7 +355,13 @@ export const executionsService = {
     const exec = db
       .select()
       .from(executions)
-      .where(and(eq(executions.id, executionId), eq(executions.userId, userId), eq(executions.inProgress, true)))
+      .where(
+        and(
+          eq(executions.id, executionId),
+          eq(executions.userId, userId),
+          eq(executions.inProgress, true),
+        ),
+      )
       .get();
 
     if (!exec) {
@@ -382,7 +400,8 @@ export const executionsService = {
       .all();
 
     // Calculate counters
-    const listCounters: Record<string, { correct: number; incorrect: number; noExecuted: number }> = {};
+    const listCounters: Record<string, { correct: number; incorrect: number; noExecuted: number }> =
+      {};
     const totalCounters = { correct: 0, incorrect: 0, noExecuted: 0 };
 
     for (const r of results) {
