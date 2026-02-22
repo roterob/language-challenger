@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Play,
   RotateCcw,
   CheckCircle2,
   XCircle,
-  Settings,
   ArrowRight,
   Volume2,
   Trophy,
@@ -26,7 +25,6 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { TypeBadge } from '@/components/type-badge';
-import { AudioPlayer } from '@/components/audio-player';
 import { getAudioLink } from '@language-challenger/shared';
 
 type Mode = 'config' | 'run' | 'result' | 'review';
@@ -59,12 +57,14 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   const [showAnswer, setShowAnswer] = useState(false);
   const [automatic, setAutomatic] = useState(false);
   const [shuffle, setShuffle] = useState(false);
+  const [questionLang, setQuestionLang] = useState<'es' | 'en'>('es');
   const [playQuestion, setPlayQuestion] = useState(false);
   const [playAnswer, setPlayAnswer] = useState(false);
   const [autoSeconds, setAutoSeconds] = useState(5);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const audioRef = useRef<HTMLAudioElement>(null);
   const reviewModeRef = useRef(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   // Reset on open
   useEffect(() => {
@@ -94,6 +94,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
       const config = execution.config as any;
       setAutomatic(config?.automaticMode ?? false);
       setShuffle(config?.shuffle ?? false);
+      setQuestionLang(config?.questionLang ?? 'es');
       setPlayQuestion(config?.playQuestion ?? false);
       setPlayAnswer(config?.playAnswer ?? false);
     }
@@ -116,19 +117,21 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
 
   // Auto-play question audio when playQuestion is enabled (manual mode)
   useEffect(() => {
-    if (mode !== 'run' || automatic || !playQuestion || !current?.contentEsAudio) return;
+    if (mode !== 'run' || automatic || !playQuestion) return;
+    const audioId = questionLang === 'es' ? current?.contentEsAudio : current?.contentEnAudio;
+    if (!audioId) return;
     if (audioRef.current) {
-      audioRef.current.src = getAudioLink(current.contentEsAudio);
+      audioRef.current.src = getAudioLink(audioId);
       audioRef.current.play().catch(() => {});
     }
-  }, [mode, currentIndex, automatic, playQuestion]);
+  }, [mode, currentIndex, automatic, playQuestion, questionLang]);
 
   // Automatic mode timer
   useEffect(() => {
     if (mode !== 'run' || !automatic || showAnswer || !current) return;
 
     // Auto-play question audio in automatic mode
-    const audioId = current.contentEsAudio;
+    const audioId = questionLang === 'es' ? current.contentEsAudio : current.contentEnAudio;
     if (audioId && audioRef.current && playQuestion) {
       audioRef.current.src = getAudioLink(audioId);
       audioRef.current.play().catch(() => {});
@@ -148,7 +151,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
     try {
       await saveConfig.mutateAsync({
         id: activeExecutionId,
-        config: { automaticMode: automatic, shuffle, playQuestion, playAnswer },
+        config: { automaticMode: automatic, shuffle, questionLang, playQuestion, playAnswer },
       });
       await refetch();
       setCurrentIndex(0);
@@ -164,7 +167,8 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
 
     // Play next question audio synchronously within user gesture context
     if (playQuestion && currentIndex + 1 < totalResources) {
-      const nextAudio = resources[currentIndex + 1]?.contentEsAudio;
+      const next = resources[currentIndex + 1];
+      const nextAudio = questionLang === 'es' ? next?.contentEsAudio : next?.contentEnAudio;
       if (nextAudio && audioRef.current) {
         audioRef.current.src = getAudioLink(nextAudio);
         audioRef.current.play().catch(() => {});
@@ -204,6 +208,20 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
     }
   };
 
+  const playAudio = (audioId: string) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const newSrc = getAudioLink(audioId);
+    // Si ya está reproduciendo el mismo, lo detiene (toggle)
+    if (isAudioPlaying && audio.src.endsWith(newSrc)) {
+      audio.pause();
+      audio.currentTime = 0;
+      return;
+    }
+    audio.src = newSrc;
+    audio.play().catch(() => {});
+  };
+
   const handleReviewFailures = async () => {
     const failedIds = resources.filter((r) => r.result === false).map((r) => r.id);
     if (failedIds.length === 0) return;
@@ -226,7 +244,12 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
-        <audio ref={audioRef} />
+        <audio
+          ref={audioRef}
+          onPlay={() => setIsAudioPlaying(true)}
+          onEnded={() => setIsAudioPlaying(false)}
+          onPause={() => setIsAudioPlaying(false)}
+        />
 
         {mode === 'config' && (
           <>
@@ -265,6 +288,33 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                 </Label>
                 <Switch id="playAnswer" checked={playAnswer} onCheckedChange={setPlayAnswer} />
               </div>
+              <div className="flex items-center justify-between">
+                <Label className="cursor-pointer">Idioma de la pregunta</Label>
+                <div className="flex rounded-md border overflow-hidden text-sm">
+                  <button
+                    type="button"
+                    className={`px-4 py-1.5 transition-colors ${
+                      questionLang === 'es'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background hover:bg-muted'
+                    }`}
+                    onClick={() => setQuestionLang('es')}
+                  >
+                    🇪🇸 Español
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-4 py-1.5 transition-colors ${
+                      questionLang === 'en'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background hover:bg-muted'
+                    }`}
+                    onClick={() => setQuestionLang('en')}
+                  >
+                    🇬🇧 Inglés
+                  </button>
+                </div>
+              </div>
               <Button className="w-full" onClick={handleStart} disabled={saveConfig.isPending}>
                 <Play className="mr-2 h-4 w-4" />
                 Comenzar
@@ -290,14 +340,65 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
 
             <div className="py-6 text-center space-y-4">
               <TypeBadge type={current.type} />
-              <p className="text-xl font-semibold">{current.contentEs}</p>
+              <p className="text-xl font-semibold">
+                {questionLang === 'es' ? current.contentEs : current.contentEn}
+              </p>
 
-              {current.audioId && <AudioPlayer audioId={current.audioId} />}
+              {(questionLang === 'es' ? current.contentEsAudio : current.contentEnAudio) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    playAudio(
+                      (questionLang === 'es' ? current.contentEsAudio : current.contentEnAudio)!,
+                    )
+                  }
+                  className="gap-2"
+                >
+                  {isAudioPlaying ? (
+                    <>
+                      <span className="animate-pulse h-2 w-2 rounded-full bg-primary inline-block" />{' '}
+                      Reproduciendo…
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="h-4 w-4" /> Audio pregunta
+                    </>
+                  )}
+                </Button>
+              )}
 
               {showAnswer ? (
                 <div className="space-y-4">
-                  <div className="rounded-lg bg-muted p-4">
-                    <p className="text-lg font-medium text-primary">{current.contentEn}</p>
+                  <div className="rounded-lg bg-muted p-4 space-y-2">
+                    <p className="text-lg font-medium text-primary">
+                      {questionLang === 'es' ? current.contentEn : current.contentEs}
+                    </p>
+                    {(questionLang === 'es' ? current.contentEnAudio : current.contentEsAudio) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          playAudio(
+                            (questionLang === 'es'
+                              ? current.contentEnAudio
+                              : current.contentEsAudio)!,
+                          )
+                        }
+                        className="gap-2 text-muted-foreground"
+                      >
+                        {isAudioPlaying ? (
+                          <>
+                            <span className="animate-pulse h-2 w-2 rounded-full bg-primary inline-block" />{' '}
+                            Reproduciendo…
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="h-4 w-4" /> Audio respuesta
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
                   <div className="flex gap-3 justify-center">
                     <Button
@@ -355,9 +456,46 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
             <div className="py-4 text-center space-y-4">
               <TypeBadge type={current.type} />
               <p className="text-xl font-semibold">{current.contentEs}</p>
-              {current.audioId && <AudioPlayer audioId={current.audioId} />}
-              <div className="rounded-lg bg-muted p-4">
+              {current.contentEsAudio && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => playAudio(current.contentEsAudio!)}
+                  className="gap-2"
+                >
+                  {isAudioPlaying ? (
+                    <>
+                      <span className="animate-pulse h-2 w-2 rounded-full bg-primary inline-block" />{' '}
+                      Reproduciendo…
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="h-4 w-4" /> Audio pregunta
+                    </>
+                  )}
+                </Button>
+              )}
+              <div className="rounded-lg bg-muted p-4 space-y-2">
                 <p className="text-lg font-medium text-primary">{current.contentEn}</p>
+                {current.contentEnAudio && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => playAudio(current.contentEnAudio!)}
+                    className="gap-2 text-muted-foreground"
+                  >
+                    {isAudioPlaying ? (
+                      <>
+                        <span className="animate-pulse h-2 w-2 rounded-full bg-primary inline-block" />{' '}
+                        Reproduciendo…
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="h-4 w-4" /> Audio respuesta
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
               <div className="flex gap-3 justify-center">
                 <Button
