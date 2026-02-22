@@ -7,8 +7,9 @@ import {
   XCircle,
   Clock,
   BarChart3,
+  Trash2,
 } from 'lucide-react';
-import { useExecutions, useUserStats } from '@/hooks/use-executions';
+import { useExecutions, useUserStats, useDeleteExecution } from '@/hooks/use-executions';
 import { useResourceStats } from '@/hooks/use-resources';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,8 +24,16 @@ import {
 } from '@/components/ui/select';
 import { TypeBadge } from '@/components/type-badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { ListExecution } from '@/components/list-execution';
 import { formatRelativeTime } from '@language-challenger/shared';
+import { toast } from 'sonner';
 
 const PAGE_SIZE = 20;
 
@@ -85,6 +94,8 @@ function ExecutionsTab() {
   const [stateFilter, setStateFilter] = useState('');
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   const [executionOpen, setExecutionOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const deleteExecution = useDeleteExecution();
   const params = useMemo(
     () => ({ page, limit: PAGE_SIZE, ...(stateFilter && { state: stateFilter }) }),
     [page, stateFilter],
@@ -136,18 +147,19 @@ function ExecutionsTab() {
               <th className="text-center p-3 font-medium">Fail</th>
               <th className="text-center p-3 font-medium">Total</th>
               <th className="text-left p-3 font-medium">Fecha</th>
+              <th className="p-3" />
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="text-center p-8 text-muted-foreground">
+                <td colSpan={7} className="text-center p-8 text-muted-foreground">
                   Cargando…
                 </td>
               </tr>
             ) : executions.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center p-8 text-muted-foreground">
+                <td colSpan={7} className="text-center p-8 text-muted-foreground">
                   No hay ejecuciones
                 </td>
               </tr>
@@ -181,6 +193,16 @@ function ExecutionsTab() {
                     <td className="p-3 text-center">{total}</td>
                     <td className="p-3 text-muted-foreground text-xs">
                       {ex.createdAt ? formatRelativeTime(new Date(ex.createdAt)) : '—'}
+                    </td>
+                    <td className="p-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                        onClick={() => setDeleteConfirmId(ex.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </td>
                   </tr>
                 );
@@ -221,6 +243,39 @@ function ExecutionsTab() {
         open={executionOpen}
         onOpenChange={setExecutionOpen}
       />
+
+      <Dialog open={!!deleteConfirmId} onOpenChange={(o) => !o && setDeleteConfirmId(null)}>
+        <DialogContent className="sm:max-w-[380px]">
+          <DialogHeader>
+            <DialogTitle>Eliminar ejecución</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            ¿Seguro que quieres eliminar esta ejecución? Esta acción no se puede deshacer.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteExecution.isPending}
+              onClick={async () => {
+                if (!deleteConfirmId) return;
+                try {
+                  await deleteExecution.mutateAsync(deleteConfirmId);
+                  toast.success('Ejecución eliminada');
+                } catch {
+                  toast.error('Error al eliminar la ejecución');
+                } finally {
+                  setDeleteConfirmId(null);
+                }
+              }}
+            >
+              Eliminar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

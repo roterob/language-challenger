@@ -129,6 +129,17 @@ export function useFinishExecution() {
   });
 }
 
+export function useDeleteExecution() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ success: boolean }>(`/executions/${id}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['executions'] });
+      qc.invalidateQueries({ queryKey: ['userStats'] });
+    },
+  });
+}
+
 export function useUserStats() {
   return useQuery({
     queryKey: ['userStats'],

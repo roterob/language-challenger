@@ -115,4 +115,16 @@ executionsRoutes.post('/:id/finish', async (c) => {
   return c.json({ execution: exec });
 });
 
+// DELETE /api/executions/:id
+executionsRoutes.delete('/:id', async (c) => {
+  const userId = c.get('userId') as string;
+  const id = c.req.param('id');
+  try {
+    executionsService.deleteExecution(id, userId);
+    return c.json({ success: true });
+  } catch (e: any) {
+    return c.json({ error: e.message }, e.status ?? 500);
+  }
+});
+
 export { executionsRoutes };

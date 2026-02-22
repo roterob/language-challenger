@@ -450,6 +450,22 @@ export const executionsService = {
     return this.getExecutionById(executionId, userId);
   },
 
+  deleteExecution(executionId: string, userId: string) {
+    const exec = db
+      .select()
+      .from(executions)
+      .where(and(eq(executions.id, executionId), eq(executions.userId, userId)))
+      .get();
+
+    if (!exec) {
+      throw Object.assign(new Error('Execution not found'), { status: 404 });
+    }
+
+    db.delete(executionResults).where(eq(executionResults.executionId, executionId)).run();
+    db.delete(executionLists).where(eq(executionLists.executionId, executionId)).run();
+    db.delete(executions).where(eq(executions.id, executionId)).run();
+  },
+
   _updateResourceStats(userId: string, resourceId: string, result: boolean) {
     const existing = db
       .select()
