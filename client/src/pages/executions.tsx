@@ -41,7 +41,7 @@ function UserStatsCards() {
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.totalExecutions ?? 0}</div>
+          <div className="text-2xl font-bold">{stats.executions ?? 0}</div>
         </CardContent>
       </Card>
       <Card>
@@ -50,7 +50,7 @@ function UserStatsCards() {
           <CheckCircle2 className="h-4 w-4 text-green-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-600">{stats.totalOk ?? 0}</div>
+          <div className="text-2xl font-bold text-green-600">{stats.correct ?? 0}</div>
         </CardContent>
       </Card>
       <Card>
@@ -59,7 +59,7 @@ function UserStatsCards() {
           <XCircle className="h-4 w-4 text-red-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-red-600">{stats.totalFail ?? 0}</div>
+          <div className="text-2xl font-bold text-red-600">{stats.incorrect ?? 0}</div>
         </CardContent>
       </Card>
       <Card>
@@ -69,8 +69,8 @@ function UserStatsCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {stats.totalOk && stats.totalFail
-              ? `${Math.round((stats.totalOk / (stats.totalOk + stats.totalFail)) * 100)}%`
+            {stats.correct && stats.incorrect
+              ? `${Math.round((stats.correct / (stats.correct + stats.incorrect)) * 100)}%`
               : '—'}
           </div>
         </CardContent>
@@ -144,32 +144,35 @@ function ExecutionsTab() {
                 </td>
               </tr>
             ) : (
-              executions.map((ex) => (
-                <tr key={ex.id} className="border-b hover:bg-muted/30">
-                  <td className="p-3 font-medium">{ex.listTitle || 'Temporal'}</td>
-                  <td className="p-3">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${stateColor[ex.state] || ''}`}
-                    >
-                      {ex.state === 'in-progress'
-                        ? 'En progreso'
-                        : ex.state === 'finished'
-                          ? 'Finalizada'
-                          : ex.state}
-                    </span>
-                  </td>
-                  <td className="p-3 text-center text-green-600 font-medium">
-                    {ex.counters?.ok ?? 0}
-                  </td>
-                  <td className="p-3 text-center text-red-600 font-medium">
-                    {ex.counters?.fail ?? 0}
-                  </td>
-                  <td className="p-3 text-center">{ex.counters?.total ?? 0}</td>
-                  <td className="p-3 text-muted-foreground text-xs">
-                    {ex.createdAt ? formatRelativeTime(new Date(ex.createdAt)) : '—'}
-                  </td>
-                </tr>
-              ))
+              executions.map((ex) => {
+                const state = ex.inProgress ? 'in-progress' : 'finished';
+                const total =
+                  (ex.counters?.correct ?? 0) +
+                  (ex.counters?.incorrect ?? 0) +
+                  (ex.counters?.noExecuted ?? 0);
+                return (
+                  <tr key={ex.id} className="border-b hover:bg-muted/30">
+                    <td className="p-3 font-medium">{ex.name || 'Temporal'}</td>
+                    <td className="p-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${stateColor[state] || ''}`}
+                      >
+                        {state === 'in-progress' ? 'En progreso' : 'Finalizada'}
+                      </span>
+                    </td>
+                    <td className="p-3 text-center text-green-600 font-medium">
+                      {ex.counters?.correct ?? 0}
+                    </td>
+                    <td className="p-3 text-center text-red-600 font-medium">
+                      {ex.counters?.incorrect ?? 0}
+                    </td>
+                    <td className="p-3 text-center">{total}</td>
+                    <td className="p-3 text-muted-foreground text-xs">
+                      {ex.createdAt ? formatRelativeTime(new Date(ex.createdAt)) : '—'}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -259,17 +262,17 @@ function ResourceStatsTab() {
               </tr>
             ) : (
               stats.map((s: any) => {
-                const total = (s.ok ?? 0) + (s.fail ?? 0);
-                const ratio = total > 0 ? Math.round((s.ok / total) * 100) : 0;
+                const total = (s.correct ?? 0) + (s.incorrect ?? 0);
+                const ratio = total > 0 ? Math.round((s.correct / total) * 100) : 0;
                 return (
                   <tr key={s.resourceId || s.id} className="border-b hover:bg-muted/30">
-                    <td className="p-3 font-mono text-xs">{s.resourceCode || s.code || '—'}</td>
-                    <td className="p-3">{s.resourceType && <TypeBadge type={s.resourceType} />}</td>
-                    <td className="p-3 max-w-[200px] truncate">
-                      {s.resourceContentEs || s.contentEs || '—'}
+                    <td className="p-3 font-mono text-xs">{s.resource?.code || '—'}</td>
+                    <td className="p-3">
+                      {s.resource?.type && <TypeBadge type={s.resource.type} />}
                     </td>
-                    <td className="p-3 text-center text-green-600 font-medium">{s.ok ?? 0}</td>
-                    <td className="p-3 text-center text-red-600 font-medium">{s.fail ?? 0}</td>
+                    <td className="p-3 max-w-[200px] truncate">{s.resource?.contentEs || '—'}</td>
+                    <td className="p-3 text-center text-green-600 font-medium">{s.correct ?? 0}</td>
+                    <td className="p-3 text-center text-red-600 font-medium">{s.incorrect ?? 0}</td>
                     <td className="p-3 text-center">{total}</td>
                     <td className="p-3 text-center">
                       <span

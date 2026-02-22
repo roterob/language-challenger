@@ -123,6 +123,6 @@ export function useFinishExecution() {
 export function useUserStats() {
   return useQuery({
     queryKey: ['userStats'],
-    queryFn: () => api.get<{ stats: UserStats }>('/auth/stats'),
+    queryFn: () => api.get<{ stats: UserStats }>('/auth/me/stats'),
   });
 }

@@ -43,7 +43,7 @@ authRoutes.patch('/me/settings', authMiddleware, async (c) => {
 authRoutes.get('/me/stats', authMiddleware, async (c) => {
   const userId = c.get('userId') as string;
   const stats = await authService.getUserStats(userId);
-  return c.json(stats);
+  return c.json({ stats });
 });
 
 export { authRoutes };
