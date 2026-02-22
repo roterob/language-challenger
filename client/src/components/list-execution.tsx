@@ -59,6 +59,8 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   const [showAnswer, setShowAnswer] = useState(false);
   const [automatic, setAutomatic] = useState(false);
   const [shuffle, setShuffle] = useState(false);
+  const [playQuestion, setPlayQuestion] = useState(false);
+  const [playAnswer, setPlayAnswer] = useState(false);
   const [autoSeconds, setAutoSeconds] = useState(5);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -92,6 +94,8 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
       const config = execution.config as any;
       setAutomatic(config?.automaticMode ?? false);
       setShuffle(config?.shuffle ?? false);
+      setPlayQuestion(config?.playQuestion ?? false);
+      setPlayAnswer(config?.playAnswer ?? false);
     }
   }, [open, execution?.id]);
 
@@ -110,13 +114,22 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   const failCount = resources.filter((r) => r.result === false).length;
   const progressPercent = totalResources > 0 ? (answeredCount / totalResources) * 100 : 0;
 
+  // Auto-play question audio when playQuestion is enabled (manual mode)
+  useEffect(() => {
+    if (mode !== 'run' || automatic || !playQuestion || !current?.contentEsAudio) return;
+    if (audioRef.current) {
+      audioRef.current.src = getAudioLink(current.contentEsAudio);
+      audioRef.current.play().catch(() => {});
+    }
+  }, [mode, currentIndex, automatic, playQuestion]);
+
   // Automatic mode timer
   useEffect(() => {
     if (mode !== 'run' || !automatic || showAnswer || !current) return;
 
-    // Auto-play audio
-    const audioId = current.audioId;
-    if (audioId && audioRef.current) {
+    // Auto-play question audio in automatic mode
+    const audioId = current.contentEsAudio;
+    if (audioId && audioRef.current && playQuestion) {
       audioRef.current.src = getAudioLink(audioId);
       audioRef.current.play().catch(() => {});
     }
@@ -135,7 +148,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
     try {
       await saveConfig.mutateAsync({
         id: activeExecutionId,
-        config: { automaticMode: automatic, shuffle },
+        config: { automaticMode: automatic, shuffle, playQuestion, playAnswer },
       });
       await refetch();
       setCurrentIndex(0);
@@ -148,6 +161,16 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
 
   const handleAnswer = async (result: 'ok' | 'fail') => {
     if (!activeExecutionId || !current) return;
+
+    // Play next question audio synchronously within user gesture context
+    if (playQuestion && currentIndex + 1 < totalResources) {
+      const nextAudio = resources[currentIndex + 1]?.contentEsAudio;
+      if (nextAudio && audioRef.current) {
+        audioRef.current.src = getAudioLink(nextAudio);
+        audioRef.current.play().catch(() => {});
+      }
+    }
+
     try {
       await saveResult.mutateAsync({
         id: activeExecutionId,
@@ -226,6 +249,22 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                 </Label>
                 <Switch id="shuffle" checked={shuffle} onCheckedChange={setShuffle} />
               </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="playQuestion" className="cursor-pointer">
+                  Reproducir audio de la pregunta automáticamente
+                </Label>
+                <Switch
+                  id="playQuestion"
+                  checked={playQuestion}
+                  onCheckedChange={setPlayQuestion}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="playAnswer" className="cursor-pointer">
+                  Reproducir audio al mostrar la respuesta
+                </Label>
+                <Switch id="playAnswer" checked={playAnswer} onCheckedChange={setPlayAnswer} />
+              </div>
               <Button className="w-full" onClick={handleStart} disabled={saveConfig.isPending}>
                 <Play className="mr-2 h-4 w-4" />
                 Comenzar
@@ -283,7 +322,17 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                   </div>
                 </div>
               ) : (
-                <Button variant="outline" size="lg" onClick={() => setShowAnswer(true)}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => {
+                    setShowAnswer(true);
+                    if (playAnswer && current?.contentEnAudio && audioRef.current) {
+                      audioRef.current.src = getAudioLink(current.contentEnAudio);
+                      audioRef.current.play().catch(() => {});
+                    }
+                  }}
+                >
                   Mostrar respuesta
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
