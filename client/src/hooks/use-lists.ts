@@ -45,7 +45,7 @@ export function useList(id: string | undefined) {
 export function useListResources(id: string | undefined) {
   return useQuery({
     queryKey: ['listResources', id],
-    queryFn: () => api.get<{ resources: Resource[] }>(`/lists/${id}/resources`),
+    queryFn: () => api.get<Resource[]>(`/lists/${id}/resources`),
     enabled: !!id,
   });
 }

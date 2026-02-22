@@ -53,13 +53,11 @@ export function ListFormModal({
   // When editing with no search: show only the list's own resources
   // When searching: show all resources matching the search (to add new ones)
   const { data: listResourcesData } = useListResources(isEdit && !search ? list?.id : undefined);
-  const { data: searchResourcesData } = useResources(
-    search ? { limit: 100, search } : undefined,
-  );
+  const { data: searchResourcesData } = useResources(search ? { limit: 100, search } : undefined);
 
   const displayedResources = search
     ? (searchResourcesData?.resources ?? [])
-    : (listResourcesData?.resources ?? []);
+    : (listResourcesData ?? []);
 
   const {
     register,
