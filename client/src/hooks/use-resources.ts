@@ -17,10 +17,19 @@ interface ResourceStatsResponse {
 }
 
 export function useResources(params?: Record<string, string | number>) {
-  const query = params
+  // Convert page-based pagination to offset-based (server uses offset)
+  const normalizedParams = params
+    ? (() => {
+        const { page, limit = 20, ...rest } = params as any;
+        const offset = page ? (page - 1) * limit : 0;
+        return { limit, offset, ...rest };
+      })()
+    : undefined;
+
+  const query = normalizedParams
     ? '?' +
       new URLSearchParams(
-        Object.entries(params)
+        Object.entries(normalizedParams)
           .filter(([, v]) => v !== '' && v !== undefined)
           .map(([k, v]) => [k, String(v)]),
       ).toString()
@@ -41,10 +50,19 @@ export function useResource(id: string | undefined) {
 }
 
 export function useResourceStats(params?: Record<string, string | number>) {
-  const query = params
+  // Convert page-based pagination to offset-based (server uses offset)
+  const normalizedParams = params
+    ? (() => {
+        const { page, limit = 20, ...rest } = params as any;
+        const offset = page ? (page - 1) * limit : 0;
+        return { limit, offset, ...rest };
+      })()
+    : undefined;
+
+  const query = normalizedParams
     ? '?' +
       new URLSearchParams(
-        Object.entries(params)
+        Object.entries(normalizedParams)
           .filter(([, v]) => v !== '' && v !== undefined)
           .map(([k, v]) => [k, String(v)]),
       ).toString()
