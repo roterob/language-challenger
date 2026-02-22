@@ -147,7 +147,9 @@ export function SearchWithTags({
                 key={tag}
                 className={cn(
                   'flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer',
-                  i === highlighted ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground',
+                  i === highlighted
+                    ? 'bg-accent text-accent-foreground'
+                    : 'hover:bg-accent hover:text-accent-foreground',
                 )}
                 onMouseDown={(e) => {
                   e.preventDefault();

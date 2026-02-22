@@ -76,15 +76,15 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
     execution?.results?.map((r) => ({
       ...r.resource,
       resultId: r.id,
-      answered: !!r.result,
+      answered: r.result !== null && r.result !== undefined,
       result: r.result,
     })) ?? [];
 
   const current = resources[currentIndex];
   const totalResources = resources.length;
   const answeredCount = resources.filter((r) => r.answered).length;
-  const okCount = resources.filter((r) => r.result === 'ok').length;
-  const failCount = resources.filter((r) => r.result === 'fail').length;
+  const okCount = resources.filter((r) => r.result === true).length;
+  const failCount = resources.filter((r) => r.result === false).length;
   const progressPercent = totalResources > 0 ? (answeredCount / totalResources) * 100 : 0;
 
   // Automatic mode timer
@@ -112,7 +112,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
     try {
       await saveConfig.mutateAsync({
         id: executionId,
-        config: { automatic, shuffle },
+        config: { automaticMode: automatic, shuffle },
       });
       await refetch();
       setCurrentIndex(0);
@@ -128,7 +128,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
     try {
       await saveResult.mutateAsync({
         id: executionId,
-        result: { resourceId: current.id, result },
+        result: { resourceId: current.id, currentIndex, result: result === 'ok' },
       });
       await refetch();
 
@@ -283,10 +283,10 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                   <div
                     key={i}
                     className={`flex items-center gap-2 px-3 py-2 border-b last:border-0 text-sm ${
-                      r.result === 'ok' ? 'bg-green-50/50' : 'bg-red-50/50'
+                      r.result === true ? 'bg-green-50/50' : 'bg-red-50/50'
                     }`}
                   >
-                    {r.result === 'ok' ? (
+                    {r.result === true ? (
                       <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
                     ) : (
                       <XCircle className="h-4 w-4 text-red-500 shrink-0" />

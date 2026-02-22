@@ -315,17 +315,14 @@ export const executionsService = {
       throw Object.assign(new Error('Execution not found or not in progress'), { status: 404 });
     }
 
-    // Find the result entry to update
+    // Find the result entry to update by position (currentIndex)
     const resultEntry = db
       .select()
       .from(executionResults)
       .where(
         and(
           eq(executionResults.executionId, executionId),
-          eq(executionResults.resourceId, data.resourceId),
-          data.listId
-            ? eq(executionResults.listId, data.listId)
-            : sql`${executionResults.listId} IS NULL`,
+          eq(executionResults.position, data.currentIndex),
         ),
       )
       .get();

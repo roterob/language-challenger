@@ -2,7 +2,12 @@ import { useState, useMemo } from 'react';
 import { Plus, Trash2, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth-context';
-import { useResources, useDeleteResource, useToggleFavourite, useResourceTags } from '@/hooks/use-resources';
+import {
+  useResources,
+  useDeleteResource,
+  useToggleFavourite,
+  useResourceTags,
+} from '@/hooks/use-resources';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -84,9 +89,15 @@ export function ResourcesPage() {
       <div className="flex flex-wrap gap-3 items-start">
         <SearchWithTags
           searchValue={search}
-          onSearchChange={(v) => { setSearch(v); setPage(1); }}
+          onSearchChange={(v) => {
+            setSearch(v);
+            setPage(1);
+          }}
           activeTags={tagFilter}
-          onTagsChange={(tags) => { setTagFilter(tags); setPage(1); }}
+          onTagsChange={(tags) => {
+            setTagFilter(tags);
+            setPage(1);
+          }}
           availableTags={availableTags}
           placeholder="Buscar por contenido, código o tag…"
           className="flex-1 min-w-[240px]"

@@ -33,7 +33,7 @@ executionsRoutes.get('/:id', async (c) => {
   const userId = c.get('userId') as string;
   const id = c.req.param('id');
   const exec = executionsService.getExecutionById(id, userId);
-  return c.json(exec);
+  return c.json({ execution: exec });
 });
 
 // POST /api/executions/start
@@ -47,7 +47,7 @@ executionsRoutes.post('/start', async (c) => {
   }
 
   const exec = executionsService.startExecution(userId, parsed.data.listIds);
-  return c.json(exec, 201);
+  return c.json({ execution: exec }, 201);
 });
 
 // POST /api/executions/start-temporary
@@ -66,7 +66,7 @@ executionsRoutes.post('/start-temporary', async (c) => {
     parsed.data.tags,
     parsed.data.resourceIds,
   );
-  return c.json(exec, 201);
+  return c.json({ execution: exec }, 201);
 });
 
 // PATCH /api/executions/:id/config
@@ -81,7 +81,7 @@ executionsRoutes.patch('/:id/config', async (c) => {
   }
 
   const exec = executionsService.saveConfig(id, userId, parsed.data);
-  return c.json(exec);
+  return c.json({ execution: exec });
 });
 
 // PATCH /api/executions/:id/result
@@ -96,7 +96,7 @@ executionsRoutes.patch('/:id/result', async (c) => {
   }
 
   const result = executionsService.saveResult(id, userId, parsed.data);
-  return c.json(result);
+  return c.json({ result });
 });
 
 // POST /api/executions/:id/restart
@@ -104,7 +104,7 @@ executionsRoutes.post('/:id/restart', async (c) => {
   const userId = c.get('userId') as string;
   const id = c.req.param('id');
   const exec = executionsService.restartExecution(id, userId);
-  return c.json(exec);
+  return c.json({ execution: exec });
 });
 
 // POST /api/executions/:id/finish
@@ -112,7 +112,7 @@ executionsRoutes.post('/:id/finish', async (c) => {
   const userId = c.get('userId') as string;
   const id = c.req.param('id');
   const exec = executionsService.finishExecution(id, userId);
-  return c.json(exec);
+  return c.json({ execution: exec });
 });
 
 export { executionsRoutes };

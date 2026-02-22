@@ -69,7 +69,7 @@ export function useSaveExecutionConfig() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, config }: { id: string; config: Partial<ExecutionConfig> }) =>
-      api.put<{ execution: Execution }>(`/executions/${id}/config`, config),
+      api.patch<{ execution: Execution }>(`/executions/${id}/config`, config),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: ['execution', id] });
     },
@@ -84,8 +84,13 @@ export function useSaveResult() {
       result,
     }: {
       id: string;
-      result: { resourceId: string; result: 'ok' | 'fail' };
-    }) => api.post<{ result: ExecutionResult }>(`/executions/${id}/results`, result),
+      result: {
+        resourceId: string;
+        listId?: string | null;
+        currentIndex: number;
+        result: boolean | null;
+      };
+    }) => api.patch<{ result: ExecutionResult }>(`/executions/${id}/result`, result),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: ['execution', id] });
     },

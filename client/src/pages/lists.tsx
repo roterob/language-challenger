@@ -79,9 +79,15 @@ export function ListsPage() {
 
       <SearchWithTags
         searchValue={search}
-        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        onSearchChange={(v) => {
+          setSearch(v);
+          setPage(1);
+        }}
         activeTags={tagFilter}
-        onTagsChange={(tags) => { setTagFilter(tags); setPage(1); }}
+        onTagsChange={(tags) => {
+          setTagFilter(tags);
+          setPage(1);
+        }}
         availableTags={availableTags}
         placeholder="Buscar listas o tag…"
         className="max-w-sm"

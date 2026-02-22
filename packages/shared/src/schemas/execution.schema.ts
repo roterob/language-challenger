@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 export const executionConfigSchema = z.object({
-  questionLang: z.enum(['en', 'es']),
-  playQuestion: z.boolean().default(false),
-  playAnswer: z.boolean().default(false),
-  writeAnswer: z.boolean().default(false),
-  automaticMode: z.boolean().default(false),
-  loopMode: z.boolean().default(false),
-  shuffle: z.boolean().default(false),
+  questionLang: z.enum(['en', 'es']).optional(),
+  playQuestion: z.boolean().optional(),
+  playAnswer: z.boolean().optional(),
+  writeAnswer: z.boolean().optional(),
+  automaticMode: z.boolean().optional(),
+  loopMode: z.boolean().optional(),
+  shuffle: z.boolean().optional(),
 });
 
 export const startExecutionSchema = z.object({
