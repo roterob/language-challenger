@@ -8,6 +8,7 @@ import {
   useToggleFavourite,
   useResourceTags,
 } from '@/hooks/use-resources';
+import { usePersistedSearch } from '@/hooks/use-persisted-search';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -27,9 +28,8 @@ const PAGE_SIZE = 20;
 export function ResourcesPage() {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
-  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const { search, setSearch, tagFilter, setTagFilter, typeFilter, setTypeFilter } =
+    usePersistedSearch('resources-search', true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
 

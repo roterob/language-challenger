@@ -3,6 +3,7 @@ import { Plus, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLists, useListResources, useListTags } from '@/hooks/use-lists';
 import { useStartExecution } from '@/hooks/use-executions';
 import { useAuth } from '@/contexts/auth-context';
+import { usePersistedSearch } from '@/hooks/use-persisted-search';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ListFormModal } from '@/components/list-form-modal';
@@ -16,8 +17,7 @@ const PAGE_SIZE = 20;
 export function ListsPage() {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const { search, setSearch, tagFilter, setTagFilter } = usePersistedSearch('lists-search');
   const [formOpen, setFormOpen] = useState(false);
   const [editingList, setEditingList] = useState<ListWithStats | null>(null);
   const [loadResourcesForId, setLoadResourcesForId] = useState<string>();
