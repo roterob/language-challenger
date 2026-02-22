@@ -19,10 +19,19 @@ interface ExecutionDetail extends Execution {
 }
 
 export function useExecutions(params?: Record<string, string | number>) {
-  const query = params
+  // Convert page-based pagination to offset-based
+  const normalizedParams = params
+    ? (() => {
+        const { page, limit = 20, ...rest } = params as any;
+        const offset = page ? (page - 1) * limit : 0;
+        return { limit, offset, ...rest };
+      })()
+    : undefined;
+
+  const query = normalizedParams
     ? '?' +
       new URLSearchParams(
-        Object.entries(params)
+        Object.entries(normalizedParams)
           .filter(([, v]) => v !== '' && v !== undefined)
           .map(([k, v]) => [k, String(v)]),
       ).toString()
@@ -57,7 +66,7 @@ export function useStartExecution() {
 export function useStartTemporaryExecution() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: { resourceIds: string[] }) =>
+    mutationFn: (data: { name: string; tags: string[]; resourceIds: string[] }) =>
       api.post<{ execution: Execution }>('/executions/start-temporary', data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['executions'] });

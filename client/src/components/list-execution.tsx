@@ -8,6 +8,8 @@ import {
   ArrowRight,
   Volume2,
   Trophy,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -16,6 +18,7 @@ import {
   useSaveResult,
   useRestartExecution,
   useFinishExecution,
+  useStartTemporaryExecution,
 } from '@/hooks/use-executions';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -26,7 +29,7 @@ import { TypeBadge } from '@/components/type-badge';
 import { AudioPlayer } from '@/components/audio-player';
 import { getAudioLink } from '@language-challenger/shared';
 
-type Mode = 'config' | 'run' | 'result';
+type Mode = 'config' | 'run' | 'result' | 'review';
 
 interface ListExecutionProps {
   executionId: string | null;
@@ -35,13 +38,21 @@ interface ListExecutionProps {
 }
 
 export function ListExecution({ executionId, open, onOpenChange }: ListExecutionProps) {
-  const { data, refetch } = useExecution(executionId ?? undefined);
+  const [activeExecutionId, setActiveExecutionId] = useState<string | null>(executionId);
+
+  // sync when parent changes executionId
+  useEffect(() => {
+    setActiveExecutionId(executionId);
+  }, [executionId]);
+
+  const { data, refetch } = useExecution(activeExecutionId ?? undefined);
   const execution = data?.execution;
 
   const saveConfig = useSaveExecutionConfig();
   const saveResult = useSaveResult();
   const restart = useRestartExecution();
   const finish = useFinishExecution();
+  const startTemporary = useStartTemporaryExecution();
 
   const [mode, setMode] = useState<Mode>('config');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -51,10 +62,18 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   const [autoSeconds, setAutoSeconds] = useState(5);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const reviewModeRef = useRef(false);
 
   // Reset on open
   useEffect(() => {
     if (open && execution) {
+      if (reviewModeRef.current) {
+        reviewModeRef.current = false;
+        setMode('review');
+        setCurrentIndex(0);
+        setShowAnswer(false);
+        return;
+      }
       const results = execution.results || [];
       // count all answered (true or false, not null)
       const answeredCount = results.filter(
@@ -112,10 +131,10 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   }, [mode, automatic, currentIndex, showAnswer, current, autoSeconds]);
 
   const handleStart = async () => {
-    if (!executionId) return;
+    if (!activeExecutionId) return;
     try {
       await saveConfig.mutateAsync({
-        id: executionId,
+        id: activeExecutionId,
         config: { automaticMode: automatic, shuffle },
       });
       await refetch();
@@ -128,17 +147,16 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   };
 
   const handleAnswer = async (result: 'ok' | 'fail') => {
-    if (!executionId || !current) return;
+    if (!activeExecutionId || !current) return;
     try {
       await saveResult.mutateAsync({
-        id: executionId,
+        id: activeExecutionId,
         result: { resourceId: current.id, currentIndex, result: result === 'ok' },
       });
       await refetch();
 
       if (currentIndex + 1 >= totalResources) {
-        // All answered, finish
-        await finish.mutateAsync(executionId);
+        await finish.mutateAsync(activeExecutionId);
         await refetch();
         setMode('result');
       } else {
@@ -151,13 +169,32 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   };
 
   const handleRestart = async () => {
-    if (!executionId) return;
+    if (!activeExecutionId) return;
     try {
-      await restart.mutateAsync(executionId);
+      await restart.mutateAsync(activeExecutionId);
       await refetch();
       setCurrentIndex(0);
       setShowAnswer(false);
       setMode('config');
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleReviewFailures = async () => {
+    const failedIds = resources.filter((r) => r.result === false).map((r) => r.id);
+    if (failedIds.length === 0) return;
+    try {
+      const res = await startTemporary.mutateAsync({
+        name: `Repaso fallos — ${execution?.name ?? ''}`,
+        tags: (execution as any)?.tags ?? [],
+        resourceIds: failedIds,
+      });
+      const newExecId = (res as any).execution?.id;
+      if (newExecId) {
+        reviewModeRef.current = true;
+        setActiveExecutionId(newExecId);
+      }
     } catch (e: any) {
       toast.error(e.message);
     }
@@ -255,6 +292,48 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
           </>
         )}
 
+        {mode === 'review' && current && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-between">
+                <span>
+                  Repaso — {currentIndex + 1} / {totalResources}
+                </span>
+              </DialogTitle>
+            </DialogHeader>
+            <Progress value={((currentIndex + 1) / totalResources) * 100} className="h-2" />
+
+            <div className="py-4 text-center space-y-4">
+              <TypeBadge type={current.type} />
+              <p className="text-xl font-semibold">{current.contentEs}</p>
+              {current.audioId && <AudioPlayer audioId={current.audioId} />}
+              <div className="rounded-lg bg-muted p-4">
+                <p className="text-lg font-medium text-primary">{current.contentEn}</p>
+              </div>
+              <div className="flex gap-3 justify-center">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  disabled={currentIndex === 0}
+                  onClick={() => setCurrentIndex((i) => i - 1)}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                {currentIndex + 1 < totalResources ? (
+                  <Button size="lg" onClick={() => setCurrentIndex((i) => i + 1)}>
+                    Siguiente
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button size="lg" onClick={() => onOpenChange(false)}>
+                    Cerrar
+                  </Button>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
         {mode === 'result' && (
           <>
             <DialogHeader>
@@ -303,11 +382,22 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
                 ))}
               </div>
 
-              <div className="flex gap-3 justify-center">
+              <div className="flex gap-3 justify-center flex-wrap">
                 <Button variant="outline" onClick={handleRestart} disabled={restart.isPending}>
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Repetir
                 </Button>
+                {failCount > 0 && (
+                  <Button
+                    variant="outline"
+                    className="border-red-200 text-red-600 hover:bg-red-50"
+                    onClick={handleReviewFailures}
+                    disabled={startTemporary.isPending}
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Repasar fallos ({failCount})
+                  </Button>
+                )}
                 <Button onClick={() => onOpenChange(false)}>Cerrar</Button>
               </div>
             </div>

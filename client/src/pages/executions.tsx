@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { TypeBadge } from '@/components/type-badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ListExecution } from '@/components/list-execution';
 import { formatRelativeTime } from '@language-challenger/shared';
 
 const PAGE_SIZE = 20;
@@ -82,6 +83,8 @@ function UserStatsCards() {
 function ExecutionsTab() {
   const [page, setPage] = useState(1);
   const [stateFilter, setStateFilter] = useState('');
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
+  const [executionOpen, setExecutionOpen] = useState(false);
   const params = useMemo(
     () => ({ page, limit: PAGE_SIZE, ...(stateFilter && { state: stateFilter }) }),
     [page, stateFilter],
@@ -95,6 +98,11 @@ function ExecutionsTab() {
     'in-progress': 'bg-blue-100 text-blue-800',
     finished: 'bg-green-100 text-green-800',
     cancelled: 'bg-gray-100 text-gray-800',
+  };
+
+  const handleRowClick = (id: string) => {
+    setSelectedExecutionId(id);
+    setExecutionOpen(true);
   };
 
   return (
@@ -151,7 +159,11 @@ function ExecutionsTab() {
                   (ex.counters?.incorrect ?? 0) +
                   (ex.counters?.noExecuted ?? 0);
                 return (
-                  <tr key={ex.id} className="border-b hover:bg-muted/30">
+                  <tr
+                    key={ex.id}
+                    className="border-b hover:bg-muted/30 cursor-pointer"
+                    onClick={() => handleRowClick(ex.id)}
+                  >
                     <td className="p-3 font-medium">{ex.name || 'Temporal'}</td>
                     <td className="p-3">
                       <span
@@ -203,6 +215,12 @@ function ExecutionsTab() {
           </div>
         </div>
       )}
+
+      <ListExecution
+        executionId={selectedExecutionId}
+        open={executionOpen}
+        onOpenChange={setExecutionOpen}
+      />
     </div>
   );
 }
