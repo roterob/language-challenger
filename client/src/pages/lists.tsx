@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useLists, useListResources, useListTags } from '@/hooks/use-lists';
+import { useLists, useListTags } from '@/hooks/use-lists';
 import { useStartExecution } from '@/hooks/use-executions';
 import { useAuth } from '@/contexts/auth-context';
 import { usePersistedSearch } from '@/hooks/use-persisted-search';
@@ -20,7 +20,6 @@ export function ListsPage() {
   const { search, setSearch, tagFilter, setTagFilter } = usePersistedSearch('lists-search');
   const [formOpen, setFormOpen] = useState(false);
   const [editingList, setEditingList] = useState<ListWithStats | null>(null);
-  const [loadResourcesForId, setLoadResourcesForId] = useState<string>();
   const [executionId, setExecutionId] = useState<string | null>(null);
   const [executionOpen, setExecutionOpen] = useState(false);
 
@@ -37,7 +36,6 @@ export function ListsPage() {
   const { data, isLoading } = useLists(params);
   const { data: tagsData } = useListTags();
   const availableTags = tagsData?.tags ?? [];
-  const { data: existingRes } = useListResources(loadResourcesForId);
   const startExecution = useStartExecution();
 
   const lists = data?.lists ?? [];
@@ -46,13 +44,11 @@ export function ListsPage() {
 
   const handleNew = () => {
     setEditingList(null);
-    setLoadResourcesForId(undefined);
     setFormOpen(true);
   };
 
   const handleEdit = (l: ListWithStats) => {
     setEditingList(l);
-    setLoadResourcesForId(l.id);
     setFormOpen(true);
   };
 
@@ -190,7 +186,7 @@ export function ListsPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         list={editingList}
-        existingResourceIds={existingRes?.resources?.map((r) => r.id) ?? []}
+        existingResourceIds={editingList?.resources ?? []}
       />
 
       <ListExecution

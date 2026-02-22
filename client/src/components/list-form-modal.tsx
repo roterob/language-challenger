@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { saveListSchema } from '@language-challenger/shared';
@@ -38,6 +38,17 @@ export function ListFormModal({
   const saveList = useSaveList();
   const isEdit = !!list;
   const [search, setSearch] = useState('');
+
+  // Re-sync when the list changes (useState doesn't reinitialize on prop changes)
+  useEffect(() => {
+    setSelectedIds(existingResourceIds);
+    reset({
+      title: list?.title || '',
+      resourceIds: existingResourceIds,
+    });
+    setSearch('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list?.id]);
   const [selectedIds, setSelectedIds] = useState<string[]>(existingResourceIds);
 
   const { data: resourcesData } = useResources({ limit: 200, ...(search && { search }) });
