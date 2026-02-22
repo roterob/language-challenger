@@ -53,10 +53,12 @@ export function useListResources(id: string | undefined) {
 export function useSaveList() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: { id?: string; title: string; resourceIds: string[] }) =>
-      data.id
-        ? api.put<{ list: List }>(`/lists/${data.id}`, data)
-        : api.post<{ list: List }>('/lists', data),
+    mutationFn: (data: { id?: string; name: string; resources: string[]; tags?: string[] }) => {
+      const { id, ...body } = data;
+      return id
+        ? api.put<{ list: List }>(`/lists/${id}`, body)
+        : api.post<{ list: List }>('/lists', body);
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['lists'] });
     },

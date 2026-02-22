@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { saveListSchema } from '@language-challenger/shared';
-import type { ListWithStats, Resource } from '@language-challenger/shared';
-import type { z } from 'zod';
+import { z } from 'zod';
+import type { ListWithStats } from '@language-challenger/shared';
 import { toast } from 'sonner';
-import { useSaveList } from '@/hooks/use-lists';
+import { useSaveList, useListResources } from '@/hooks/use-lists';
 import { useResources } from '@/hooks/use-resources';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,9 +17,12 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { TypeBadge } from '@/components/type-badge';
-import { Search, X, Check } from 'lucide-react';
+import { Search, Check } from 'lucide-react';
 
-type FormData = z.infer<typeof saveListSchema>;
+const formSchema = z.object({
+  name: z.string().min(1, 'El nombre es obligatorio'),
+});
+type FormData = z.infer<typeof formSchema>;
 
 interface ListFormProps {
   open: boolean;
@@ -42,17 +44,22 @@ export function ListFormModal({
   // Re-sync when the list changes (useState doesn't reinitialize on prop changes)
   useEffect(() => {
     setSelectedIds(existingResourceIds);
-    reset({
-      title: list?.title || '',
-      resourceIds: existingResourceIds,
-    });
+    reset({ name: list?.name || '' });
     setSearch('');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list?.id]);
   const [selectedIds, setSelectedIds] = useState<string[]>(existingResourceIds);
 
-  const { data: resourcesData } = useResources({ limit: 200, ...(search && { search }) });
-  const allResources = resourcesData?.resources ?? [];
+  // When editing with no search: show only the list's own resources
+  // When searching: show all resources matching the search (to add new ones)
+  const { data: listResourcesData } = useListResources(isEdit && !search ? list?.id : undefined);
+  const { data: searchResourcesData } = useResources(
+    search ? { limit: 100, search } : undefined,
+  );
+
+  const displayedResources = search
+    ? (searchResourcesData?.resources ?? [])
+    : (listResourcesData?.resources ?? []);
 
   const {
     register,
@@ -60,11 +67,8 @@ export function ListFormModal({
     reset,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(saveListSchema),
-    defaultValues: {
-      title: list?.title || '',
-      resourceIds: existingResourceIds,
-    },
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: list?.name || '' },
   });
 
   const toggleResource = (id: string) => {
@@ -75,8 +79,9 @@ export function ListFormModal({
     try {
       await saveList.mutateAsync({
         ...(isEdit ? { id: list.id } : {}),
-        title: data.title,
-        resourceIds: selectedIds,
+        name: data.name,
+        resources: selectedIds,
+        tags: list?.tags ?? [],
       });
       toast.success(isEdit ? 'Lista actualizada' : 'Lista creada');
       reset();
@@ -99,8 +104,8 @@ export function ListFormModal({
         >
           <div className="space-y-2">
             <Label htmlFor="title">Título</Label>
-            <Input id="title" {...register('title')} />
-            {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
+            <Input id="name" {...register('name')} />
+            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-2 flex-1 overflow-hidden flex flex-col">
@@ -110,12 +115,17 @@ export function ListFormModal({
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar recursos…"
+                placeholder={isEdit ? 'Buscar para añadir más recursos…' : 'Buscar recursos…'}
                 className="pl-9"
               />
             </div>
+            {isEdit && !search && (
+              <p className="text-xs text-muted-foreground">
+                Mostrando los recursos de esta lista. Busca para añadir más.
+              </p>
+            )}
             <div className="flex-1 overflow-y-auto border rounded-md max-h-[300px]">
-              {allResources.map((r) => {
+              {displayedResources.map((r) => {
                 const isSelected = selectedIds.includes(r.id);
                 return (
                   <div
