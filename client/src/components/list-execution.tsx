@@ -56,10 +56,14 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
   useEffect(() => {
     if (open && execution) {
       const results = execution.results || [];
-      const answeredCount = results.filter((r) => r.result).length;
-      if (execution.state === 'finished') {
+      // count all answered (true or false, not null)
+      const answeredCount = results.filter(
+        (r) => r.result !== null && r.result !== undefined,
+      ).length;
+      if (!execution.inProgress) {
         setMode('result');
       } else if (answeredCount > 0) {
+        // execution already started: resume where it left off
         setMode('run');
         setCurrentIndex(answeredCount);
       } else {
@@ -67,7 +71,7 @@ export function ListExecution({ executionId, open, onOpenChange }: ListExecution
       }
       setShowAnswer(false);
       const config = execution.config as any;
-      setAutomatic(config?.automatic ?? false);
+      setAutomatic(config?.automaticMode ?? false);
       setShuffle(config?.shuffle ?? false);
     }
   }, [open, execution?.id]);
