@@ -1,0 +1,89 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist
+build
+.next
+out
+*.tsbuildinfo
+
+# Development
+.env
+.env*.local
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Testing
+coverage
+.nyc_output
+*.lcov
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation (not needed in image)
+*.md
+!DEPLOYMENT.md
+docs
+
+# Development tools
+.storybook
+.stories
+.eslintrc*
+.prettierrc*
+tsconfig*.json
+!tsconfig.base.json
+
+# Legacy Meteor files (if any)
+.meteor
+imports
+
+# Tests
+tests
+e2e
+cypress
+*.spec.ts
+*.spec.js
+*.test.ts
+*.test.js
+
+# Deployment scripts (already in image)
+deploy
+scripts/*.sh
+
+# Data and logs (use volumes)
+data
+logs
+*.log
+*.sqlite
+*.sqlite-*
+
+# Temporary files
+tmp
+temp
+.cache
+
+# Lock files (we copy them explicitly)
+# pnpm-lock.yaml
+# package-lock.json
+# yarn.lock
