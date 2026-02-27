@@ -1,0 +1,61 @@
+#!/usr/bin/expect -f
+# =============================================================================
+# Script para solucionar permisos de Docker en LXC
+# =============================================================================
+
+set timeout 300
+set password "muddeb-Penwas-3weqfa"
+set host "root@192.168.1.105"
+
+spawn ssh -o StrictHostKeyChecking=no $host bash -s
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "set -e\r"
+    }
+}
+
+send "echo '=========================================='\r"
+send "echo '  SOLUCIONANDO PERMISOS DE DOCKER'\r"
+send "echo '=========================================='\r"
+
+send "# Detener Docker\r"
+send "systemctl stop docker\r"
+send "systemctl stop containerd\r"
+
+send "# Limpiar storage de Docker\r"
+send "rm -rf /var/lib/docker/*\r"
+send "rm -rf /var/lib/containerd/*\r"
+
+send "# Configurar Docker daemon para usar fuse-overlayfs\r"
+send "mkdir -p /etc/docker\r"
+send "cat > /etc/docker/daemon.json << 'EOF'\r"
+send "{\r"
+send "  \"storage-driver\": \"fuse-overlayfs\",\r"
+send "  \"log-driver\": \"json-file\",\r"
+send "  \"log-opts\": {\r"
+send "    \"max-size\": \"10m\",\r"
+send "    \"max-file\": \"3\"\r"
+send "  }\r"
+send "}\r"
+send "EOF\r"
+
+send "# Instalar fuse-overlayfs\r"
+send "apt-get update\r"
+send "apt-get install -y fuse-overlayfs\r"
+
+send "# Reiniciar Docker\r"
+send "systemctl start docker\r"
+send "sleep 3\r"
+
+send "echo ''\r"
+send "echo '✅ Docker configurado con fuse-overlayfs'\r"
+send "docker info | grep 'Storage Driver'\r"
+
+send "exit\r"
+
+expect eof

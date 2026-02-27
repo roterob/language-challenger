@@ -1,0 +1,59 @@
+#!/usr/bin/expect -f
+# =============================================================================
+# Script para deployar la aplicación en el LXC
+# =============================================================================
+
+set timeout 600
+set password "muddeb-Penwas-3weqfa"
+set host "root@192.168.1.105"
+
+spawn ssh -o StrictHostKeyChecking=no $host bash -s
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "set -e\r"
+    }
+}
+
+send "echo '=========================================='\r"
+send "echo '  CAMBIANDO A USUARIO APPUSER'\r"
+send "echo '=========================================='\r"
+send "su - appuser << 'EOFSU'\r"
+send "set -e\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  CLONANDO REPOSITORIO'\r"
+send "echo '=========================================='\r"
+send "cd /opt/language-challenger\r"
+send "git clone https://github.com/roterob/language-challenger.git .\r"
+send "echo '✅ Repositorio clonado'\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  EJECUTANDO DEPLOYMENT INICIAL'\r"
+send "echo '=========================================='\r"
+send "chmod +x scripts/deploy.sh\r"
+send "./scripts/deploy.sh --init\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  ✅ DEPLOYMENT COMPLETADO'\r"
+send "echo '=========================================='\r"
+send "echo ''\r"
+send "echo 'La aplicación está corriendo en:'\r"
+send "echo '  http://192.168.1.105:3001'\r"
+send "echo ''\r"
+send "echo 'Credenciales por defecto:'\r"
+send "echo '  Username: admin'\r"
+send "echo '  Password: secret'\r"
+send "echo ''\r"
+send "EOFSU\r"
+
+send "exit\r"
+
+expect eof

@@ -1,0 +1,87 @@
+#!/usr/bin/expect -f
+# =============================================================================
+# Script para ejecutar comandos SSH con contraseña
+# =============================================================================
+
+set timeout 300
+set password "muddeb-Penwas-3weqfa"
+set host "root@192.168.1.105"
+
+spawn ssh -o StrictHostKeyChecking=no $host bash -s
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "set -e\r"
+    }
+}
+
+send "echo '=========================================='\r"
+send "echo '  LIMPIANDO DOCKER ANTERIOR'\r"
+send "echo '=========================================='\r"
+send "systemctl stop docker 2>/dev/null || true\r"
+send "systemctl stop containerd 2>/dev/null || true\r"
+send "apt-get remove -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin 2>/dev/null || true\r"
+send "apt-get autoremove -y 2>/dev/null || true\r"
+send "rm -f /etc/apt/sources.list.d/docker.list*\r"
+send "rm -rf /etc/apt/keyrings/docker.gpg*\r"
+send "apt-get clean && rm -rf /var/lib/apt/lists/*\r"
+send "echo '✅ Limpieza completada'\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  ACTUALIZANDO CÓDIGO'\r"
+send "echo '=========================================='\r"
+send "cd /root/language-challenger\r"
+send "git pull origin master\r"
+send "echo '✅ Código actualizado'\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  INSTALANDO DEPENDENCIAS'\r"
+send "echo '=========================================='\r"
+send "apt-get update\r"
+send "apt-get install -y ca-certificates curl gnupg lsb-release software-properties-common\r"
+send "echo '✅ Dependencias instaladas'\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  INSTALANDO DOCKER'\r"
+send "echo '=========================================='\r"
+send "install -m 0755 -d /etc/apt/keyrings\r"
+send "curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg\r"
+send "chmod a+r /etc/apt/keyrings/docker.gpg\r"
+send "echo 'deb \[arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg\] https://download.docker.com/linux/debian bookworm stable' > /etc/apt/sources.list.d/docker.list\r"
+send "apt-get update\r"
+send "apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin\r"
+send "systemctl start docker\r"
+send "systemctl enable docker\r"
+send "echo '✅ Docker instalado'\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  VERIFICANDO INSTALACIÓN'\r"
+send "echo '=========================================='\r"
+send "docker --version\r"
+send "docker compose version\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  CREANDO USUARIO Y DIRECTORIOS'\r"
+send "echo '=========================================='\r"
+send "useradd -m -s /bin/bash appuser 2>/dev/null || echo 'Usuario ya existe'\r"
+send "usermod -aG docker appuser\r"
+send "mkdir -p /opt/language-challenger/\{data,backups,logs\}\r"
+send "chown -R appuser:appuser /opt/language-challenger\r"
+send "echo '✅ Usuario y directorios creados'\r"
+
+send "echo ''\r"
+send "echo '=========================================='\r"
+send "echo '  ✅ INSTALACIÓN COMPLETADA'\r"
+send "echo '=========================================='\r"
+send "exit\r"
+
+expect eof
